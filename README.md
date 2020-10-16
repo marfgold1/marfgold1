@@ -1,16 +1,13 @@
-### Hi there 👋
+Amar Fadil - 16520008
 
-<!--
-**marfgold1/marfgold1** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## Hello 👋
 
-Here are some ideas to get you started:
+💬 My name is Amar Fadil, usually, people called me Amar.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+🌱 I'm currently enrolled in **Institut Teknologi Bandung** from **Sekolah Teknik Elektro dan Informatika (STEI)** as a first-year college student.
+
+📫 You can reach me via [LINE](https://line.me/ti/p/~amfa4321) / [Instagram](instagram.com/marfgold1) / [Email](mailto:marfgold1@gmail.com)
+
+😄 Pronouns: Him/He
+
+My past work: working with @openwisp for Google Code-in 2019.
