@@ -349,10 +349,13 @@
 	box-shadow: var(--shadow);
 }
 
+/* The box scrolls sideways on narrow screens, which also clips vertically; the padding
+   keeps tall glyphs (integral limits, exponents) inside it instead of cutting them off. */
 .katex-display {
 	overflow-x: auto;
 	overflow-y: hidden;
-	margin: 1.3em 0;
+	margin: 0.8em 0;
+	padding: 0.6em 0.25em;
 }
 
 .post-body details {

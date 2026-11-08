@@ -214,17 +214,18 @@
 		inset: 0;
 	}
 
-	/* minor ticks, one per 2%; the part already read is dimmed by a mask (--p set inline) */
-	.ruler-track::before {
-		content: '';
+	/* minor scale: positioned in ProgressRuler.tsx so section ticks fall on it */
+	.ruler-minor {
 		position: absolute;
 		right: 12px;
-		top: 0;
-		bottom: 0;
 		width: 8px;
-		background: repeating-linear-gradient(to bottom, var(--tick) 0 1px, transparent 1px 2%);
-		-webkit-mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.4) var(--p, 0%), #000 var(--p, 0%));
-		mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.4) var(--p, 0%), #000 var(--p, 0%));
+		height: 1px;
+		transform: translateY(-50%);
+		background: var(--tick);
+	}
+
+	.ruler-minor.reached {
+		background: var(--tick-done);
 	}
 
 	.ruler-mark {
