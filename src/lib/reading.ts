@@ -60,6 +60,11 @@ export function useReading(): Reading {
 
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
+let seekImpl: (p: number) => void = () => {};
+
+/** Scroll so that position `p` (0..1 along the article) sits on the reading line. */
+export const seekTo = (p: number) => seekImpl(p);
+
 /** Start tracking `root` (the <article>). Returns a cleanup function. */
 export function startReading(root: HTMLElement, title: string): () => void {
 	let headings: Heading[] = [];
@@ -111,6 +116,12 @@ export function startReading(root: HTMLElement, title: string): () => void {
 		schedule();
 	};
 
+	seekImpl = (p) => {
+		const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const top = Math.max(0, start + p * height - innerHeight * READING_LINE);
+		scrollTo({ top, behavior: calm ? 'auto' : 'smooth' });
+	};
+
 	const mutations = new MutationObserver(measure);
 	mutations.observe(root, { childList: true, subtree: true });
 	const sizes = new ResizeObserver(measure);
@@ -126,6 +137,7 @@ export function startReading(root: HTMLElement, title: string): () => void {
 		removeEventListener('scroll', schedule);
 		removeEventListener('resize', measure);
 		if (frame) cancelAnimationFrame(frame);
+		seekImpl = () => {};
 		publish(IDLE);
 	};
 }

@@ -8,7 +8,9 @@
 export interface RulerFit {
 	/** number of equal steps; the grid has n + 1 ticks at k / n */
 	n: number;
-	/** each input position snapped to the grid, as a 0..1 fraction (same order as the input) */
+	/** grid index (0..n) each input position snapped to, in input order */
+	ks: number[];
+	/** the same, as a 0..1 fraction (k / n) */
 	snapped: number[];
 	/** |snapped - exact| in px for each input, for tuning and tests */
 	errPx: number[];
@@ -44,7 +46,7 @@ export function fitRuler(ps: number[], trackPx: number): RulerFit {
 
 		if (cost < bestCost) {
 			bestCost = cost;
-			best = { n, snapped: ks.map((k) => k / n), errPx };
+			best = { n, ks, snapped: ks.map((k) => k / n), errPx };
 		}
 	}
 	return best!;
