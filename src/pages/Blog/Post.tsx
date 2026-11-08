@@ -24,20 +24,25 @@ export function BlogPost({ slug }: { slug: string }) {
 
 	return (
 		<article class="post">
-			<header>
+			<header class="post-head">
+				<div class="post-meta">
+					<time datetime={post.date}>{formatDate(post.date)}</time>
+					{post.tags.length > 0 && (
+						<ul class="tags">
+							{post.tags.map((t) => (
+								<li key={t}>{t}</li>
+							))}
+						</ul>
+					)}
+				</div>
 				<h1>{post.title}</h1>
-				<time datetime={post.date}>{formatDate(post.date)}</time>
-				{post.tags.length > 0 && (
-					<ul class="tags">
-						{post.tags.map((t) => (
-							<li key={t}>{t}</li>
-						))}
-					</ul>
-				)}
+				<p class="post-desc">{post.description}</p>
 			</header>
-			<ErrorBoundary>
-				<Content components={mdxComponents} />
-			</ErrorBoundary>
+			<div class="post-body">
+				<ErrorBoundary>
+					<Content components={mdxComponents} />
+				</ErrorBoundary>
+			</div>
 		</article>
 	);
 }

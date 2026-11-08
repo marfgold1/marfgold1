@@ -8,11 +8,22 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeShiki from '@shikijs/rehype';
+import rehypeSlug from 'rehype-slug';
+import { createCssVariablesTheme } from 'shiki';
 import { blogIndex, scanPosts } from './plugins/blog-index.ts';
 import { mdxCss } from './plugins/mdx-css.ts';
 import { remarkKatexCss, katexWoff2Only } from './plugins/katex-css.ts';
 
 const blogsDir = fileURLToPath(new URL('./src/blogs', import.meta.url));
+
+// Code colours come from CSS variables (--shiki-token-*), mapped to the site tokens in
+// src/styles/post.css, so one definition covers light and dark.
+const shikiTheme = createCssVariablesTheme({
+	name: 'site',
+	variablePrefix: '--shiki-',
+	variableDefaults: {},
+	fontStyle: true,
+});
 
 // https://vitejs.dev/config/
 export default defineConfig(() => {
@@ -31,8 +42,9 @@ export default defineConfig(() => {
 					jsxImportSource: 'preact',
 					remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm, remarkMath, remarkKatexCss],
 					rehypePlugins: [
+						rehypeSlug, // heading ids for deep links and the reading progress UI
 						rehypeKatex,
-						[rehypeShiki, { themes: { light: 'github-light', dark: 'github-dark' }, defaultColor: false, inline: 'tailing-curly-colon' }],
+						[rehypeShiki, { theme: shikiTheme, inline: 'tailing-curly-colon' }],
 					],
 				}),
 			},

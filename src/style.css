@@ -1,3 +1,5 @@
+@import './styles/post.css';
+
 /* ---- base ---- */
 :root {
 	font-family: var(--font-body);
@@ -133,77 +135,4 @@ main {
 	.site-bar nav {
 		gap: 0.9rem;
 	}
-}
-
-/* ---- blog (restyled in styles/post.css) ---- */
-.post-list {
-	list-style: none;
-	padding: 0;
-}
-.post-list li {
-	margin-bottom: 2rem;
-}
-.tags {
-	list-style: none;
-	padding: 0;
-	display: flex;
-	gap: 0.5rem;
-	flex-wrap: wrap;
-}
-.tags li {
-	font: 0.75rem var(--font-mono);
-	padding: 2px 10px;
-	border-radius: 999px;
-	background: var(--accent-soft);
-	color: var(--accent);
-	margin: 0;
-}
-.post table {
-	border-collapse: collapse;
-	display: block;
-	overflow-x: auto;
-}
-.post th,
-.post td {
-	border: 1px solid var(--border);
-	padding: 0.4rem 0.8rem;
-}
-.post pre {
-	padding: 1rem;
-	overflow-x: auto;
-	border-radius: 6px;
-}
-.post code {
-	font-size: 0.9em;
-}
-.shiki,
-.shiki span {
-	color: var(--shiki-light);
-	background-color: var(--shiki-light-bg);
-}
-:root[data-theme='dark'] .shiki,
-:root[data-theme='dark'] .shiki span {
-	color: var(--shiki-dark);
-	background-color: var(--shiki-dark-bg);
-}
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme='light']) .shiki,
-	:root:not([data-theme='light']) .shiki span {
-		color: var(--shiki-dark);
-		background-color: var(--shiki-dark-bg);
-	}
-}
-.katex-display {
-	overflow-x: auto;
-	overflow-y: hidden;
-}
-.callout {
-	padding: 0.75rem 1rem;
-	border-left: 4px solid var(--accent);
-	background: var(--accent-soft);
-	margin: 1rem 0;
-}
-.callout-warning {
-	border-color: var(--amber);
-	background: var(--amber-soft);
 }

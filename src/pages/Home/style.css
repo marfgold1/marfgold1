@@ -3,11 +3,11 @@
 	padding-top: 4rem;
 }
 
-img {
+.home img {
 	margin-bottom: 1.5rem;
 }
 
-img:hover {
+.home img:hover {
 	filter: drop-shadow(0 0 2em color-mix(in srgb, var(--accent) 65%, transparent));
 }
 

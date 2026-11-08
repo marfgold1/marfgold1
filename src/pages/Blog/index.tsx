@@ -3,7 +3,7 @@ import { getPosts, formatDate } from '@/lib/blog.js';
 export function BlogIndex() {
 	return (
 		<section>
-			<h1>Blog</h1>
+			<h1 class="page-title">Blog</h1>
 			<ul class="post-list">
 				{getPosts().map((p) => (
 					<li key={p.slug}>

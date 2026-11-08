@@ -1,0 +1,118 @@
+---
+title: Every Markdown feature, on one page
+date: 2026-11-08
+description: A style guide for the blog. Headings, quotes, tables, code, images, math and all the small stuff in between.
+tags: [meta, markdown]
+---
+
+This is a normal paragraph with **bold**, *italic*, ***both***, ~~strikethrough~~, <mark>highlighted</mark> text, `inline code`, and a [regular link](https://example.com). Press <kbd>⌘</kbd> + <kbd>K</kbd> to search, write H<sub>2</sub>O and E = mc<sup>2</sup>, or add a footnote[^1].
+
+## Headings, all levels
+
+### Third level heading
+
+#### Fourth level heading
+
+##### Fifth level heading
+
+###### Sixth level heading
+
+Body text follows headings with a comfortable rhythm.
+
+---
+
+## Quotes
+
+> Simplicity is prerequisite for reliability.
+>
+> — Edsger W. Dijkstra
+
+> A quote can have several paragraphs.
+>
+> And even a nested quote inside:
+>
+> > Nested quotes drop the size and switch to teal.
+
+## Lists
+
+- Unordered item one
+- Item two with a nested list
+  - Nested a
+  - Nested b
+- Item three
+
+1. First, install dependencies
+2. Second, run the dev server
+   1. Open `localhost:5173`
+3. Third, ship it
+
+- [x] Pick a palette
+- [x] Pick fonts
+- [ ] Write the theme CSS
+
+## Code
+
+Use `const` and `=>`, or run `npm run dev`. Ligatures render in `!==`, `>=` and `->`. Inline highlighting works too: `const x: number = 1{:ts}`.
+
+```ts
+// read the saved theme, fall back to system
+export function getTheme(): string {
+  const saved = localStorage.getItem("theme");
+  if (saved !== null && saved.length >= 4) return saved;
+  return matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark" : "light";
+}
+```
+
+```bash
+# install the fonts
+npm i @fontsource-variable/figtree @fontsource-variable/jetbrains-mono
+```
+
+## Tables
+
+| Font                | Role     | Ligatures | Weights |
+| ------------------- | -------- | :-------: | ------: |
+| Bricolage Grotesque | Headings |     no    | 200–800 |
+| Figtree             | Body     |     no    | 300–900 |
+| JetBrains Mono      | Code     |    yes    | 100–800 |
+
+| Token      | Light     | Dark      | Contrast (L / D) | Use           |
+| ---------- | --------- | --------- | ---------------- | ------------- |
+| `--accent` | `#5049CC` | `#A9B1FF` | 6.3 / 9.4        | Links, buttons |
+| `--teal`   | `#066F59` | `#4FE0BD` | 5.8 / 11.5       | Tips, tags    |
+| `--amber`  | `#9A4F06` | `#F2B35E` | 5.0 / 7.3        | Warnings      |
+| `--muted`  | `#4C6270` | `#A49FC6` | 6.0 / 7.6        | Meta text     |
+
+## Images
+
+![A gradient banner in the site palette](/img/banner.svg)
+
+![Daytime hills](/img/hills-day.svg)
+
+![Night-time hills](/img/hills-night.svg)
+
+## Math
+
+Inline math like $e^{i\pi} + 1 = 0$ sits in the text, while display math gets its own line:
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
+$$
+
+## Callouts and details
+
+<Callout type="note">Info callouts use indigo and always carry a text label.</Callout>
+
+<Callout type="tip">Tips use teal. Label plus colour, never colour alone.</Callout>
+
+<Callout type="warning">Warnings use amber, which is safe for red-green colour blindness.</Callout>
+
+<details>
+<summary>Collapsible section</summary>
+
+Hidden content lives here.
+
+</details>
+
+[^1]: Footnotes sit at the bottom in smaller muted text.
