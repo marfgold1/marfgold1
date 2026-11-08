@@ -1,0 +1,368 @@
+/*
+ * Reading progress UI. Three pieces share one scroll store (src/lib/reading.ts):
+ *   - phones   (<= 860px): header slides away on scroll down; the reading bar stays pinned
+ *   - desktop  (>= 861px): sticky "On this page" list
+ *   - large    (>= 1280px): ruler on the right edge with the current progress value
+ */
+
+.post-layout {
+	display: block;
+}
+
+.toc,
+.ruler {
+	display: none;
+}
+
+.reading-bar {
+	display: none;
+}
+
+/* ---- phones ---- */
+@media (max-width: 860px) {
+	.site-header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 50;
+		background: color-mix(in srgb, var(--bg) 94%, transparent);
+		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(12px);
+		border-bottom: 1px solid var(--border);
+		transition: transform 0.25s ease;
+	}
+
+	/* reserve the space the fixed header takes (measured in Header.tsx) */
+	#app {
+		padding-top: var(--header-h, 0px);
+	}
+
+	/* no reading bar: the whole header leaves; with one, only the top part does */
+	.site-header[data-hidden] {
+		transform: translateY(-100%);
+	}
+
+	.site-header[data-hidden][data-reading] {
+		transform: translateY(calc(-1 * var(--top-h, 0px)));
+	}
+
+	.reading-bar {
+		display: block;
+		position: relative;
+		border-top: 1px solid var(--border);
+	}
+
+	.reading-bar::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 3px;
+		background: var(--border);
+	}
+
+	.reading-toggle {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		width: 100%;
+		height: 42px;
+		padding: 0 16px;
+		background: none;
+		border: 0;
+		color: var(--fg);
+		font: inherit;
+		text-align: left;
+		cursor: pointer;
+	}
+
+	.reading-count {
+		flex: none;
+		font: 0.75rem var(--font-mono);
+		color: var(--muted);
+	}
+
+	.reading-label {
+		flex: 1;
+		min-width: 0;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 0.95rem;
+		letter-spacing: -0.01em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.reading-chev {
+		flex: none;
+		color: var(--accent);
+		font-size: 1.1rem;
+		line-height: 1;
+		transition: transform 0.2s;
+	}
+
+	.reading-toggle[aria-expanded='true'] .reading-chev {
+		transform: rotate(180deg);
+	}
+
+	.reading-progress {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		height: 3px;
+		background: var(--accent);
+		z-index: 1;
+	}
+
+	/* section list: ✓ read, ● reading now, ○ still ahead (shape as well as colour) */
+	.reading-sheet {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		max-height: 62vh;
+		overflow-y: auto;
+		margin: 0;
+		padding: 6px 16px 14px;
+		list-style: none;
+		background: var(--bg);
+		border-bottom: 1px solid var(--border);
+		box-shadow: var(--shadow);
+	}
+
+	.reading-sheet li + li {
+		border-top: 1px solid var(--border);
+	}
+
+	.reading-sheet a {
+		display: flex;
+		gap: 12px;
+		align-items: baseline;
+		padding: 10px 0;
+		color: var(--muted);
+		text-decoration: none;
+		line-height: 1.35;
+	}
+
+	.reading-sheet a.sub {
+		padding-left: 26px;
+		font-size: 0.9rem;
+	}
+
+	.reading-sheet i {
+		flex: none;
+		width: 16px;
+		text-align: center;
+		font-style: normal;
+		font-size: 0.75rem;
+		color: var(--muted);
+	}
+
+	.reading-sheet i::before {
+		content: '○';
+	}
+
+	.reading-sheet a.done i {
+		color: var(--teal);
+	}
+
+	.reading-sheet a.done i::before {
+		content: '✓';
+	}
+
+	.reading-sheet a.cur {
+		color: var(--accent);
+		font-weight: 700;
+	}
+
+	.reading-sheet a.cur i {
+		color: var(--accent);
+	}
+
+	.reading-sheet a.cur i::before {
+		content: '●';
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.site-header,
+	.reading-chev {
+		transition: none;
+	}
+}
+
+/* ---- desktop: table of contents on the left ---- */
+@media (min-width: 861px) {
+	.post-layout {
+		display: grid;
+		grid-template-columns: 190px minmax(0, 720px);
+		gap: 48px;
+		justify-content: center;
+	}
+
+	.toc {
+		display: block;
+		position: sticky;
+		top: 24px;
+		align-self: start;
+		max-height: calc(100vh - 48px);
+		overflow-y: auto;
+		margin-top: 2.6rem;
+		font-size: 0.875rem;
+	}
+
+	.toc-title {
+		margin: 0 0 0.6rem;
+		font: 700 0.7rem var(--font-mono);
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+
+	.toc a {
+		display: block;
+		padding: 4px 0 4px 12px;
+		border-left: 2px solid var(--border);
+		color: var(--muted);
+		text-decoration: none;
+		line-height: 1.4;
+	}
+
+	.toc a.sub {
+		padding-left: 24px;
+		font-size: 0.8125rem;
+	}
+
+	.toc a:hover {
+		color: var(--fg);
+	}
+
+	.toc a.on {
+		color: var(--accent);
+		border-left-color: var(--accent);
+		font-weight: 600;
+	}
+}
+
+/* ---- large screens: progress ruler on the right edge ---- */
+@media (min-width: 1280px) {
+	.ruler {
+		display: block;
+		position: fixed;
+		z-index: 40;
+		right: 0;
+		top: 96px;
+		bottom: 32px;
+		width: 64px;
+		font-family: var(--font-mono);
+	}
+
+	.ruler-track {
+		position: absolute;
+		inset: 0;
+	}
+
+	/* minor ticks: one per 2% */
+	.ruler-track::before {
+		content: '';
+		position: absolute;
+		right: 12px;
+		top: 0;
+		bottom: 0;
+		width: 8px;
+		background: repeating-linear-gradient(
+			to bottom,
+			color-mix(in srgb, var(--muted) 45%, transparent) 0 1px,
+			transparent 1px 2%
+		);
+	}
+
+	.ruler-mark {
+		position: absolute;
+		right: 0;
+		width: 44px;
+		height: 14px;
+		transform: translateY(-50%);
+		color: var(--muted);
+	}
+
+	.ruler-mark::before {
+		content: '';
+		position: absolute;
+		right: 12px;
+		top: 50%;
+		width: 20px;
+		height: 1px;
+		background: currentColor;
+	}
+
+	.ruler-mark.sub::before {
+		width: 12px;
+	}
+
+	.ruler-mark.reached {
+		color: var(--accent);
+	}
+
+	.ruler-tip {
+		position: absolute;
+		right: 48px;
+		top: 50%;
+		transform: translateY(-50%);
+		max-width: 260px;
+		padding: 3px 8px;
+		border: 1px solid var(--border);
+		background: var(--bg);
+		box-shadow: var(--shadow);
+		color: var(--fg);
+		font-size: 0.7rem;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.ruler-mark:hover .ruler-tip,
+	.ruler-mark:focus-visible .ruler-tip {
+		opacity: 1;
+	}
+
+	/* current position: value + line */
+	.ruler-now {
+		position: absolute;
+		right: 0;
+		width: 64px;
+		height: 0;
+		pointer-events: none;
+	}
+
+	.ruler-now::after {
+		content: '';
+		position: absolute;
+		right: 12px;
+		top: 0;
+		width: 30px;
+		height: 2px;
+		margin-top: -1px;
+		background: var(--accent);
+	}
+
+	.ruler-now span {
+		position: absolute;
+		right: 48px;
+		top: 0;
+		transform: translateY(-50%);
+		padding: 1px 6px;
+		background: var(--bg);
+		color: var(--accent);
+		font-size: 0.75rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+}

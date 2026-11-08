@@ -24,12 +24,12 @@
 }
 
 .post-list h2 a {
-	color: var(--fg);
+	color: inherit;
 	text-decoration: none;
 }
 
 .post-list h2 a:hover {
-	color: var(--accent);
+	color: var(--link);
 }
 
 .post-list p {
@@ -55,7 +55,6 @@
 .tags li {
 	font: 0.75rem var(--font-mono);
 	padding: 2px 10px;
-	border-radius: 999px;
 	background: var(--accent-soft);
 	color: var(--accent);
 	margin: 0;
@@ -154,7 +153,6 @@
 	background: var(--mark);
 	color: inherit;
 	padding: 0 3px;
-	border-radius: 3px;
 }
 
 .post-body kbd {
@@ -163,7 +161,6 @@
 	border: 1px solid var(--border);
 	border-bottom-width: 3px;
 	padding: 1px 7px;
-	border-radius: 6px;
 }
 
 .post-body hr {
@@ -251,7 +248,6 @@
 	margin: 0 0.6em 0 0;
 	vertical-align: -0.18em;
 	border: 2px solid var(--accent);
-	border-radius: 5px;
 }
 
 .post-body .task-list-item input:checked {
@@ -266,7 +262,6 @@
 	background: var(--code-bg);
 	border: 1px solid var(--border);
 	padding: 1px 6px;
-	border-radius: 6px;
 	font-feature-settings: 'calt', 'liga';
 }
 
@@ -290,7 +285,6 @@
 	padding: 14px 16px;
 	overflow-x: auto;
 	border: 1px solid var(--border);
-	border-radius: 12px;
 	box-shadow: var(--shadow);
 	font-size: 0.875rem;
 	line-height: 1.65;
@@ -310,7 +304,6 @@
 	overflow-x: auto;
 	margin: 1.5rem 0;
 	border: 1px solid var(--border);
-	border-radius: 12px;
 	box-shadow: var(--shadow);
 }
 
@@ -353,7 +346,6 @@
 	max-width: 100%;
 	height: auto;
 	margin: 1.4rem 0;
-	border-radius: 14px;
 	box-shadow: var(--shadow);
 }
 
@@ -365,7 +357,6 @@
 
 .post-body details {
 	border: 1px solid var(--border);
-	border-radius: 12px;
 	padding: 0.7rem 1rem;
 	margin: 1.3rem 0;
 	background: var(--surface);
@@ -377,8 +368,22 @@
 }
 
 .post-body sup a {
+	font-weight: 700;
+	padding: 0 1px;
+}
+
+/* headings are links to themselves (rehype-autolink-headings, "wrap") */
+.post-body :is(h2, h3, h4, h5, h6) > a {
+	color: inherit;
 	text-decoration: none;
-	font-weight: 600;
+	cursor: pointer;
+}
+
+.post-body :is(h2, h3, h4, h5, h6) > a:hover {
+	text-decoration: underline;
+	text-decoration-color: var(--link);
+	text-decoration-thickness: 3px;
+	text-underline-offset: 6px;
 }
 
 .post-body .footnotes {
@@ -403,7 +408,6 @@
 	padding: 0.75rem 1rem 0.75rem 1.1rem;
 	border-left: 4px solid var(--accent);
 	background: var(--accent-soft);
-	border-radius: 0 12px 12px 0;
 	font-size: 1rem;
 	line-height: 1.6;
 }
@@ -460,7 +464,6 @@
 	.post-body pre,
 	.table-wrap {
 		margin-inline: -16px;
-		border-radius: 0;
 		border-inline: 0;
 	}
 	.table-wrap table {

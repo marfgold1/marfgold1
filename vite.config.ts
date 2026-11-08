@@ -9,6 +9,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeShiki from '@shikijs/rehype';
 import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { createCssVariablesTheme } from 'shiki';
 import { blogIndex, scanPosts } from './plugins/blog-index.ts';
 import { mdxCss } from './plugins/mdx-css.ts';
@@ -43,6 +44,7 @@ export default defineConfig(() => {
 					remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm, remarkMath, remarkKatexCss],
 					rehypePlugins: [
 						rehypeSlug, // heading ids for deep links and the reading progress UI
+						[rehypeAutolinkHeadings, { behavior: 'wrap' }], // the heading text itself links to its anchor
 						rehypeKatex,
 						[rehypeShiki, { theme: shikiTheme, inline: 'tailing-curly-colon' }],
 					],
