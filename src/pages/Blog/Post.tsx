@@ -4,7 +4,6 @@ import { getPost, formatDate, type PostMeta } from '@/lib/blog.js';
 import { markUsed } from '@/lib/chunk-usage.js';
 import { startReading, scrollToHeading } from '@/lib/reading.js';
 import { mdxComponents } from '@/components/mdx/index.js';
-import { Toc } from '@/components/Toc.jsx';
 import { ProgressRuler } from '@/components/ProgressRuler.jsx';
 import { NotFound } from '@/pages/_404.jsx';
 
@@ -43,35 +42,32 @@ function PostView({ post }: { post: PostMeta }) {
 	const Content = load(slug);
 	const article = useRef<HTMLElement>(null);
 
-	// Reading progress (mobile bar, table of contents, desktop ruler) follows this article.
+	// Reading progress (mobile bar and desktop ruler) follows this article.
 	useEffect(() => (article.current ? startReading(article.current, post.title) : undefined), [slug]);
 
 	return (
 		<>
-			<div class="post-layout">
-				<Toc />
-				<article class="post" ref={article}>
-					<header class="post-head">
-						<div class="post-meta">
-							<time datetime={post.date}>{formatDate(post.date)}</time>
-							{post.tags.length > 0 && (
-								<ul class="tags">
-									{post.tags.map((t) => (
-										<li key={t}>{t}</li>
-									))}
-								</ul>
-							)}
-						</div>
-						<h1>{post.title}</h1>
-						<p class="post-desc">{post.description}</p>
-					</header>
-					<div class="post-body" onClick={onHeadingClick}>
-						<ErrorBoundary>
-							<Content components={mdxComponents} />
-						</ErrorBoundary>
+			<article class="post" ref={article}>
+				<header class="post-head">
+					<div class="post-meta">
+						<time datetime={post.date}>{formatDate(post.date)}</time>
+						{post.tags.length > 0 && (
+							<ul class="tags">
+								{post.tags.map((t) => (
+									<li key={t}>{t}</li>
+								))}
+							</ul>
+						)}
 					</div>
-				</article>
-			</div>
+					<h1>{post.title}</h1>
+					<p class="post-desc">{post.description}</p>
+				</header>
+				<div class="post-body" onClick={onHeadingClick}>
+					<ErrorBoundary>
+						<Content components={mdxComponents} />
+					</ErrorBoundary>
+				</div>
+			</article>
 			<ProgressRuler />
 		</>
 	);

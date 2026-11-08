@@ -3,7 +3,7 @@ import { useEffect, useState } from 'preact/hooks';
 /**
  * Reading progress for a blog post. One scroll listener feeds a tiny shared store, read by
  * the mobile reading bar (components/ReadingBar), the desktop table of contents
- * (components/Toc) and the right-edge ruler (components/ProgressRuler).
+ * (components/ReadingBar) and the right-edge ruler (components/ProgressRuler).
  */
 
 export interface Heading {
@@ -12,7 +12,7 @@ export interface Heading {
 	level: 2 | 3;
 	/** document-absolute top, in px */
 	y: number;
-	/** scroll progress (0..1) at which this heading counts as reached */
+	/** where the heading sits along the article (0..1), so every tick on the ruler is distinct */
 	p: number;
 }
 
@@ -22,14 +22,20 @@ export interface Reading {
 	headings: Heading[];
 	/** index of the heading currently being read, -1 before the first one */
 	current: number;
-	/** 0..1 */
+	/** 0..1, measured over the article itself (0 when it starts, 1 when its end is in view) */
 	progress: number;
+	/** reading position along the article (0..1, clamped), on the same axis as Heading.p */
+	at: number;
+	/** false when the article fits on one screen, so there is nothing to track */
+	scrollable: boolean;
 }
 
-const IDLE: Reading = { active: false, title: '', headings: [], current: -1, progress: 0 };
+const IDLE: Reading = { active: false, title: '', headings: [], current: -1, progress: 0, at: 0, scrollable: false };
 
-/** a heading counts as "reached" once its top is within this many px of the viewport top */
+/** a heading counts as "current" once its top is within this many px of the viewport top */
 const REACHED_AT = 110;
+/** the ruler's reading line: this fraction of the way down the viewport */
+const READING_LINE = 0.3;
 
 let state = IDLE;
 const subscribers = new Set<(s: Reading) => void>();
@@ -58,18 +64,29 @@ const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 export function startReading(root: HTMLElement, title: string): () => void {
 	let headings: Heading[] = [];
 	let frame = 0;
-
-	const scrollMax = () => document.documentElement.scrollHeight - innerHeight;
+	// Everything is measured over the article only, never the header, footer or spacing around
+	// it. `progress` runs 0 (article top at viewport top) to 1 (article end in view), clamped.
+	let start = 0;
+	let height = 1;
+	let span = 0;
 
 	const update = () => {
 		frame = 0;
-		const max = scrollMax();
 		let current = -1;
 		for (let i = 0; i < headings.length; i++) {
 			if (headings[i].y - scrollY <= REACHED_AT) current = i;
 			else break;
 		}
-		publish({ active: true, title, headings, current, progress: max > 0 ? clamp01(scrollY / max) : 0 });
+		const atEnd = span > 0 && scrollY >= start + span - 1;
+		publish({
+			active: true,
+			title,
+			headings,
+			current,
+			progress: span > 0 ? clamp01((scrollY - start) / span) : 0,
+			at: atEnd ? 1 : clamp01((scrollY + innerHeight * READING_LINE - start) / height),
+			scrollable: span > 0,
+		});
 	};
 	const schedule = () => {
 		if (!frame) frame = requestAnimationFrame(update);
@@ -78,7 +95,9 @@ export function startReading(root: HTMLElement, title: string): () => void {
 	// Headings are measured again whenever content or layout changes (the MDX body loads
 	// lazily, and images / fonts shift things down).
 	const measure = () => {
-		const max = scrollMax();
+		start = root.getBoundingClientRect().top + scrollY;
+		height = Math.max(1, root.offsetHeight);
+		span = height - innerHeight;
 		headings = [...root.querySelectorAll<HTMLElement>('.post-body h2[id], .post-body h3[id]')].map((el) => {
 			const y = el.getBoundingClientRect().top + scrollY;
 			return {
@@ -86,7 +105,7 @@ export function startReading(root: HTMLElement, title: string): () => void {
 				text: el.textContent ?? '',
 				level: el.tagName === 'H3' ? 3 : 2,
 				y,
-				p: max > 0 ? clamp01((y - REACHED_AT) / max) : 0,
+				p: clamp01((y - start) / height),
 			};
 		});
 		schedule();

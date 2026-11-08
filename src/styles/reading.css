@@ -1,19 +1,16 @@
 /*
- * Reading progress UI. Three pieces share one scroll store (src/lib/reading.ts):
- *   - phones   (<= 860px): header slides away on scroll down; the reading bar stays pinned
- *   - desktop  (>= 861px): sticky "On this page" list
- *   - large    (>= 1280px): ruler on the right edge with the current progress value
+ * Reading progress UI. Both pieces share one scroll store (src/lib/reading.ts):
+ *   - phones (<= 860px):  header slides away on scroll down; the reading bar stays pinned
+ *   - large (>= 1280px):  ruler on the right edge with a title for every section
+ * The article itself is always a single centred column.
  */
 
-.post-layout {
-	display: block;
+.post {
+	max-width: 720px;
+	margin-inline: auto;
 }
 
-.toc,
-.ruler {
-	display: none;
-}
-
+.ruler,
 .reading-bar {
 	display: none;
 }
@@ -194,68 +191,14 @@
 	}
 }
 
-/* ---- desktop: table of contents on the left ---- */
-@media (min-width: 861px) {
-	.post-layout {
-		display: grid;
-		grid-template-columns: 190px minmax(0, 720px);
-		gap: 48px;
-		justify-content: center;
-	}
-
-	/* Always the second column: with no headings there is no TOC, and the article would
-	   otherwise fall into the narrow first column. */
-	.post-layout > .post {
-		grid-column: 2;
-	}
-
-	.toc {
-		display: block;
-		position: sticky;
-		top: 24px;
-		align-self: start;
-		max-height: calc(100vh - 48px);
-		overflow-y: auto;
-		margin-top: 2.6rem;
-		font-size: 0.875rem;
-	}
-
-	.toc-title {
-		margin: 0 0 0.6rem;
-		font: 700 0.7rem var(--font-mono);
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--muted);
-	}
-
-	.toc a {
-		display: block;
-		padding: 4px 0 4px 12px;
-		border-left: 2px solid var(--border);
-		color: var(--muted);
-		text-decoration: none;
-		line-height: 1.4;
-	}
-
-	.toc a.sub {
-		padding-left: 24px;
-		font-size: 0.8125rem;
-	}
-
-	.toc a:hover {
-		color: var(--fg);
-	}
-
-	.toc a.on {
-		color: var(--accent);
-		border-left-color: var(--accent);
-		font-weight: 600;
-	}
-}
-
-/* ---- large screens: progress ruler on the right edge ---- */
+/* ---- large screens: ruler on the right edge ----
+ * Muted on purpose: sections you have not reached are quiet, and sections you have read
+ * past are quieter still. The boundary between the two is your position. */
 @media (min-width: 1280px) {
 	.ruler {
+		--tick: color-mix(in srgb, var(--muted) 65%, transparent);
+		--tick-done: color-mix(in srgb, var(--muted) 28%, transparent);
+
 		display: block;
 		position: fixed;
 		z-index: 40;
@@ -271,7 +214,7 @@
 		inset: 0;
 	}
 
-	/* minor ticks: one per 2% */
+	/* minor ticks, one per 2%; the part already read is dimmed by a mask (--p set inline) */
 	.ruler-track::before {
 		content: '';
 		position: absolute;
@@ -279,20 +222,28 @@
 		top: 0;
 		bottom: 0;
 		width: 8px;
-		background: repeating-linear-gradient(
-			to bottom,
-			color-mix(in srgb, var(--muted) 45%, transparent) 0 1px,
-			transparent 1px 2%
-		);
+		background: repeating-linear-gradient(to bottom, var(--tick) 0 1px, transparent 1px 2%);
+		-webkit-mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.4) var(--p, 0%), #000 var(--p, 0%));
+		mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.4) var(--p, 0%), #000 var(--p, 0%));
 	}
 
 	.ruler-mark {
 		position: absolute;
 		right: 0;
-		width: 44px;
+		width: 64px;
 		height: 14px;
 		transform: translateY(-50%);
-		color: var(--muted);
+		color: var(--tick);
+		text-decoration: none;
+	}
+
+	.ruler-mark.reached {
+		color: var(--tick-done);
+	}
+
+	.ruler-mark:hover,
+	.ruler-mark:focus-visible {
+		color: var(--fg);
 	}
 
 	.ruler-mark::before {
@@ -309,66 +260,38 @@
 		width: 12px;
 	}
 
-	.ruler-mark.reached {
-		color: var(--accent);
-	}
-
-	.ruler-tip {
+	/* section titles: always shown for h2 (unless two would collide); the rest on hover */
+	.ruler-label {
 		position: absolute;
-		right: 48px;
+		right: 44px;
 		top: 50%;
 		transform: translateY(-50%);
-		max-width: 260px;
-		padding: 3px 8px;
-		border: 1px solid var(--border);
-		background: var(--bg);
-		box-shadow: var(--shadow);
-		color: var(--fg);
+		/* never reach into the centred 720px article column */
+		max-width: clamp(0px, calc((100vw - 720px) / 2 - 76px), 260px);
+		padding: 1px 6px;
 		font-size: 0.7rem;
+		line-height: 1.3;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
+		text-align: right;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		color: inherit;
 		opacity: 0;
 		pointer-events: none;
 	}
 
-	.ruler-mark:hover .ruler-tip,
-	.ruler-mark:focus-visible .ruler-tip {
+	.ruler-mark.labelled .ruler-label {
 		opacity: 1;
 	}
 
-	/* current position: value + line */
-	.ruler-now {
-		position: absolute;
-		right: 0;
-		width: 64px;
-		height: 0;
-		pointer-events: none;
-	}
-
-	.ruler-now::after {
-		content: '';
-		position: absolute;
-		right: 12px;
-		top: 0;
-		width: 30px;
-		height: 2px;
-		margin-top: -1px;
-		background: var(--accent);
-	}
-
-	.ruler-now span {
-		position: absolute;
-		right: 48px;
-		top: 0;
-		transform: translateY(-50%);
-		padding: 1px 6px;
+	.ruler-mark:hover .ruler-label,
+	.ruler-mark:focus-visible .ruler-label {
+		opacity: 1;
 		background: var(--bg);
-		color: var(--accent);
-		font-size: 0.75rem;
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
+		border: 1px solid var(--border);
+		box-shadow: var(--shadow);
+		z-index: 1;
 	}
 }
