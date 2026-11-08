@@ -52,6 +52,11 @@ pre {
 	font-family: var(--font-mono);
 }
 
+::selection {
+	background: light-dark(#98e8c1, #3d1a78);
+	color: light-dark(#14212b, #ebe8f8);
+}
+
 :focus-visible {
 	outline: 2px solid var(--accent);
 	outline-offset: 2px;
