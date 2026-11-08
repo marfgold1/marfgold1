@@ -1,0 +1,28 @@
+---
+title: Test Post
+date: 2026-11-07
+description: Exercises tables, math, code highlighting and an interactive component.
+tags: [test, mdx]
+---
+
+## Intro
+
+Plain paragraph with inline math $E = mc^2$.
+
+<Callout type="note">Callouts are custom components.</Callout>
+
+| Feature | Supported |
+| ------- | --------- |
+| Tables  | yes       |
+| LaTeX   | yes       |
+| Inline code | `const x: number = 1{:ts}` |
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+```ts
+const greet = (name: string): string => `hello ${name}`;
+```
+
+Try it: <Counter initial={3} />
