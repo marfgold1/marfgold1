@@ -367,9 +367,13 @@
 	font-weight: 600;
 }
 
+/* footnote refs are tiny, so give them a heavier explicit underline */
 .post-body sup a {
 	font-weight: 700;
 	padding: 0 1px;
+	text-decoration-line: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 2px;
 }
 
 /* headings are links to themselves (rehype-autolink-headings, "wrap") */

@@ -24,9 +24,9 @@
 	--amber: light-dark(#9a4f06, #f2b35e);
 	--amber-soft: light-dark(#fbe7cf, #3a2c14);
 
-	/* prose: green links (always underlined), purple headings */
+	/* prose: green links (always underlined), blue headings */
 	--link: light-dark(#066f59, #4fe0bd);
-	--heading: light-dark(#5a2ca0, #c7b0ff);
+	--heading: light-dark(#1f5fb0, #8fb8ff);
 
 	--code-bg: light-dark(#e8f1f5, #17122b);
 	--mark: light-dark(#fdeea8, #5b4a12);
