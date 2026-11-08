@@ -283,13 +283,17 @@
 		pointer-events: none;
 	}
 
+	/* a visible title is part of the link, so clicking it navigates too */
 	.ruler-mark.labelled .ruler-label {
 		opacity: 1;
+		pointer-events: auto;
+		cursor: pointer;
 	}
 
 	.ruler-mark:hover .ruler-label,
 	.ruler-mark:focus-visible .ruler-label {
 		opacity: 1;
+		pointer-events: auto;
 		background: var(--bg);
 		border: 1px solid var(--border);
 		box-shadow: var(--shadow);
