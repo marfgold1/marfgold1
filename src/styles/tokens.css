@@ -25,9 +25,11 @@
 	--amber-soft: light-dark(#fbe7cf, #3a2c14);
 
 	/* prose: blue links (always underlined), green headings. Dark mode uses the exact flag
-	   colours (#7bade2 blue, #26ceaa green); light mode darkens them to keep AA contrast. */
+	   colours (#7bade2 blue, #26ceaa green). The links darken in light mode for AA body-text
+	   contrast; headings are large and bold, so they only need the 3:1 large-text AA level and
+	   can stay close to the bright flag green (#26ceaa itself is just 1.9:1 on the light page). */
 	--link: light-dark(#2a63ad, #7bade2);
-	--heading: light-dark(#06795f, #26ceaa);
+	--heading: light-dark(#1d9b80, #26ceaa);
 	--purple: light-dark(#3d1a78, #c9b3ff);
 
 	--code-bg: light-dark(#e8f1f5, #17122b);
