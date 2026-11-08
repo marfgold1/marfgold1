@@ -203,6 +203,12 @@
 		justify-content: center;
 	}
 
+	/* Always the second column: with no headings there is no TOC, and the article would
+	   otherwise fall into the narrow first column. */
+	.post-layout > .post {
+		grid-column: 2;
+	}
+
 	.toc {
 		display: block;
 		position: sticky;
