@@ -7,6 +7,11 @@ import { BlogPost } from '@/pages/Blog/Post.jsx';
 import { NotFound } from '@/pages/_404.jsx';
 import { getPost } from '@/lib/blog.js';
 import { usedChunks } from '@/lib/chunk-usage.js';
+import '@fontsource-variable/bricolage-grotesque/index.css';
+import '@fontsource-variable/figtree/index.css';
+import '@fontsource-variable/figtree/wght-italic.css';
+import '@fontsource-variable/jetbrains-mono/index.css';
+import '@/styles/tokens.css';
 import './style.css';
 
 export function App(_props: { url?: string }) {

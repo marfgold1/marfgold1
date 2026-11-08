@@ -1,21 +1,26 @@
 import { useLocation } from 'preact-iso';
+import { ThemeToggle } from '@/components/ThemeToggle.jsx';
 
 export function Header() {
 	const { url } = useLocation();
 
 	return (
-		<header>
-			<nav>
-				<a href="/" class={url == '/' ? 'active' : undefined}>
-					Home
+		<header class="site-header">
+			<div class="stripe" aria-hidden="true" />
+			<div class="site-bar">
+				<a class="brand" href="/">
+					marfgold
 				</a>
-				<a href="/blog" class={url.startsWith('/blog') ? 'active' : undefined}>
-					Blog
-				</a>
-				<a href="/404" class={url == '/404' ? 'active' : undefined}>
-					404
-				</a>
-			</nav>
+				<nav aria-label="Main">
+					<a href="/" class={url == '/' ? 'active' : undefined}>
+						Home
+					</a>
+					<a href="/blog" class={url.startsWith('/blog') ? 'active' : undefined}>
+						Blog
+					</a>
+					<ThemeToggle />
+				</nav>
+			</div>
 		</header>
 	);
 }

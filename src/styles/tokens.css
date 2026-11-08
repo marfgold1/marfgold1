@@ -1,0 +1,53 @@
+/*
+ * Design tokens. Pastel blue + teal + amber.
+ * Every colour is a light-dark() pair, so light/dark/system all work from one
+ * definition: `color-scheme` below is switched by <html data-theme="light|dark">
+ * (set by src/lib/theme.ts); with no attribute it follows the OS setting.
+ *
+ * Colour-blind safety: indigo / teal / amber differ in lightness as well as hue,
+ * and states (note / tip / warning) always carry a text label, never colour alone.
+ * Text pairs are >= 4.5:1 (WCAG AA) in both themes.
+ */
+:root {
+	color-scheme: light dark;
+
+	--bg: light-dark(#f4f9fb, #110d22);
+	--surface: light-dark(#e6f1f4, #1a1533);
+	--fg: light-dark(#14212b, #ebe8f8);
+	--muted: light-dark(#4c6270, #a49fc6);
+	--border: light-dark(#cfe2e6, #2e2752);
+
+	--accent: light-dark(#5049cc, #a9b1ff);
+	--accent-soft: light-dark(#e2e0fa, #272150);
+	--teal: light-dark(#066f59, #4fe0bd);
+	--teal-soft: light-dark(#d3f3e6, #10302d);
+	--amber: light-dark(#9a4f06, #f2b35e);
+	--amber-soft: light-dark(#fbe7cf, #3a2c14);
+
+	--code-bg: light-dark(#e8f1f5, #17122b);
+	--mark: light-dark(#fdeea8, #5b4a12);
+	--shadow: light-dark(0 6px 22px #14212b14, 0 6px 22px #0006);
+
+	--font-body: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--font-display: 'Bricolage Grotesque Variable', var(--font-body);
+	--font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+	/* the flag-colour stripe (decorative only) */
+	--stripe: linear-gradient(
+		90deg,
+		#078d70 0 16.66%,
+		#26ceaa 0 33.33%,
+		#98e8c1 0 50%,
+		#7bade2 0 66.66%,
+		#5049cc 0 83.33%,
+		#3d1a78 0
+	);
+}
+
+:root[data-theme='light'] {
+	color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+}
