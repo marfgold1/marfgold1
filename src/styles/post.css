@@ -500,3 +500,15 @@
 		white-space: nowrap;
 	}
 }
+
+/* figures authored for light backgrounds stay legible in dark mode */
+:root[data-theme='dark'] .doc-figure {
+	background: #f4f9fb;
+	padding: 10px;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) .doc-figure {
+		background: #f4f9fb;
+		padding: 10px;
+	}
+}

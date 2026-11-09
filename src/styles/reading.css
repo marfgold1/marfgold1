@@ -270,7 +270,6 @@
 		height: 1px;
 		background: var(--minor);
 		cursor: pointer;
-		transition: width 0.1s;
 	}
 
 	/* a taller, wider hit area than the 1px line (one grid step high, so neighbours don't overlap) */
@@ -293,7 +292,7 @@
 		background: var(--fg);
 	}
 
-	/* section tick: a 1px row, continuing outward from its minor tick */
+	/* section tick: a 1px row, continuing outward from its minor tick; drawn above minors */
 	.ruler-mark {
 		position: absolute;
 		right: 0;
@@ -301,6 +300,7 @@
 		height: 1px;
 		color: var(--tick);
 		text-decoration: none;
+		z-index: 1;
 	}
 
 	.ruler-mark::before {
@@ -313,8 +313,15 @@
 		background: currentColor;
 	}
 
-	.ruler-mark.sub::before {
-		width: 8px;
+	/* tick length encodes the heading level (h1 > h2 > h3) */
+	.ruler-mark.lv1::before {
+		width: 24px;
+	}
+	.ruler-mark.lv2::before {
+		width: 20px;
+	}
+	.ruler-mark.lv3::before {
+		width: 16px;
 	}
 
 	.ruler-mark::after {
@@ -375,8 +382,4 @@
 	}
 }
 
-@media (prefers-reduced-motion: reduce) {
-	.ruler-minor {
-		transition: none;
-	}
-}
+

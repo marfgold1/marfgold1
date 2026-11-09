@@ -9,7 +9,7 @@ import { useEffect, useState } from 'preact/hooks';
 export interface Heading {
 	id: string;
 	text: string;
-	level: 2 | 3;
+	level: 1 | 2 | 3;
 	/** document-absolute top, in px */
 	y: number;
 	/** where the heading sits along the article (0..1), so every tick on the ruler is distinct */
@@ -103,12 +103,12 @@ export function startReading(root: HTMLElement, title: string): () => void {
 		start = root.getBoundingClientRect().top + scrollY;
 		height = Math.max(1, root.offsetHeight);
 		span = height - innerHeight;
-		headings = [...root.querySelectorAll<HTMLElement>('.post-body h2[id], .post-body h3[id]')].map((el) => {
+		headings = [...root.querySelectorAll<HTMLElement>('.post-body h1[id], .post-body h2[id], .post-body h3[id]')].map((el) => {
 			const y = el.getBoundingClientRect().top + scrollY;
 			return {
 				id: el.id,
 				text: el.textContent ?? '',
-				level: el.tagName === 'H3' ? 3 : 2,
+				level: el.tagName === 'H1' ? 1 : el.tagName === 'H3' ? 3 : 2,
 				y,
 				p: clamp01((y - start) / height),
 			};
@@ -147,6 +147,9 @@ export function scrollToHeading(id: string) {
 	const el = document.getElementById(id);
 	if (!el) return;
 	const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-	el.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+	// land just below the fixed header instead of under it
+	const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
+	const top = el.getBoundingClientRect().top + scrollY - header - 12;
+	scrollTo({ top: Math.max(0, top), behavior: calm ? 'auto' : 'smooth' });
 	history.replaceState(null, '', `#${id}`);
 }

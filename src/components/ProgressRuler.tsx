@@ -32,13 +32,21 @@ export function ProgressRuler() {
 	const row = (k: number) => Math.round((k / n) * trackPx);
 	const current = Math.round(at * n);
 
-	let lastShown = -Infinity;
-	const marks = headings.map((h, i) => {
+	// one tick per grid row: when several headings land on the same row, the greatest
+	// level (smallest tag) wins the tick and its link
+	const byRow = new Map<number, { h: (typeof headings)[number]; y: number; show?: boolean }>();
+	headings.forEach((h, i) => {
 		const y = row(ks[i]);
-		const show = y - lastShown >= LABEL_GAP;
-		if (show) lastShown = y;
-		return { h, y, show, k: ks[i] };
+		const prev = byRow.get(y);
+		if (!prev || h.level < prev.h.level) byRow.set(y, { h, y });
 	});
+	const marks = [...byRow.values()].sort((a, b) => a.y - b.y);
+
+	let lastShown = -Infinity;
+	for (const m of marks) {
+		m.show = m.y - lastShown >= LABEL_GAP;
+		if (m.show) lastShown = m.y;
+	}
 
 	return (
 		<nav class="ruler" aria-label="Reading progress">
@@ -52,11 +60,11 @@ export function ProgressRuler() {
 						onClick={() => seekTo(k / n)}
 					/>
 				))}
-				{marks.map(({ h, y, show, k }) => (
+				{marks.map(({ h, y, show }) => (
 					<a
 						key={h.id}
 						href={`#${h.id}`}
-						class={`ruler-mark${h.level === 3 ? ' sub' : ''}${k <= current ? ' reached' : ''}${show ? ' labelled' : ''}`}
+						class={`ruler-mark lv${Math.min(3, h.level)}${y / trackPx <= at ? ' reached' : ''}${show ? ' labelled' : ''}`}
 						style={{ top: `${y}px` }}
 						onClick={(e) => {
 							e.preventDefault();
