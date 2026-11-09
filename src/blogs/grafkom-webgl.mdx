@@ -65,18 +65,23 @@ Matriks transformasi **dibaca dari kanan ke kiri**, namun **perkaliannya dihitun
 WebGL selalu mengasumsikan matriks yang diberikan dalam ***column-major ordering*** seperti transformasi translasi berikut:
 
 
-$$\begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 10 & 20 & 30 & 1 \end{pmatrix}$$
+$$
+\begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 10 & 20 & 30 & 1 \end{pmatrix}
+$$
 
 Akan tetapi, dalam matematika dan teori grafika, biasanya kita akan menggunakan matriks dalam *row-major ordering* seperti transformasi translasi berikut:
 
 
-$$\begin{pmatrix} 1 & 0 & 0 & 10 \\ 0 & 1 & 0 & 20 \\ 0 & 0 & 1 & 30 \\ 0 & 0 & 0 & 1 \end{pmatrix}$$
+$$
+\begin{pmatrix} 1 & 0 & 0 & 10 \\ 0 & 1 & 0 & 20 \\ 0 & 0 & 1 & 30 \\ 0 & 0 & 0 & 1 \end{pmatrix}
+$$
 
 Jadi, perlu diingat, ketika melakukan komposisi transformasi, misalnya transformasi TRS (ingat, bacanya scale dulu, baru rotasi, dan terakhir translasi) dimana matriks T,R,S dalam bentuk *row-major ordering*, yang diminta WebGL adalah $(TRS)^{T}$ sehingga **hasil perkaliannya** harus ditranspose di akhir. Akan tetapi, jika kita memiliki matriks T, R, dan S dalam bentuk *column-major ordering* (yakni $T^{T}$, $R^{T}$, dan $S^{T}$), maka kita harus melakukan perkalian dengan $S^{T}*R^{T}*T^{T}$, **kebalikan** dari *row-major ordering*. Secara matematis, hal ini bisa dituliskan sebagai:
 
 
 $$
 (TRS)^{T} = (T*R*S)^{T} = S^{T}*R^{T}*T^{T}
+
 $$
 
 Dimana T, R, S merupakan matriks transformasi dalam bentuk *row-major ordering*. Supaya tidak membingungkan penulisan perkalian matriks yang sudah dalam *column-major*, selain fungsi `mul` yang mengalikan matriks dari kiri ke kanan, biasa dibutuhkan fungsi `premul` yang mengalikan matriks secara terbalik (dari kanan ke kiri), sehingga $premul\left( T^{T},R^{T},S^{T} \right) = mul(T,R,S)^{T} = mul\left( S^{T},R^{T},T^{T} \right) = premul(S,R,T)^{T}$.
@@ -182,7 +187,9 @@ Transformasi *local* memiliki dua representasi yang berbeda pada glTF. Pertama, 
 ```
 
 
-$$M = \begin{pmatrix} 2.0 & 0.0 & 0.0 & 10.0 \\ 0.0 & 0.866 & -0.25 & 20.0 \\ 0.0 & 0.5 & 0.433 & 30.0 \\ 0.0 & 0.0 & 0.0 & 1.0 \end{pmatrix}$$
+$$
+M = \begin{pmatrix} 2.0 & 0.0 & 0.0 & 10.0 \\ 0.0 & 0.866 & -0.25 & 20.0 \\ 0.0 & 0.5 & 0.433 & 30.0 \\ 0.0 & 0.0 & 0.0 & 1.0 \end{pmatrix}
+$$
 
 Kedua, bisa juga dengan memberikan transformasi dalam properti (T)ranslation (translasi), (R)otation (rotasi), dan (S)cale (scaling) yang disebut juga sebagai TRS. Berikut adalah transformasi yang sama dengan representasi matriks sebelumnya, namun dalam bentuk properti TRS (rotasi dalam quaternion (x,y,z,w))
 
@@ -196,17 +203,23 @@ Kedua, bisa juga dengan memberikan transformasi dalam properti (T)ranslation (tr
 
 Lalu bagaimana cara mendapatkan matriks tersebut dari translasi, rotasi, dan scale? Tentu saja, hasil perkalian dari representasi matriks setiap transformasi tersebut. Dalam kelas grafika komputer, kita belajar bahwa transformasi biasa dilakukan dalam sebuah *reference system* berupa koordinat homogen (*homogeneous coordinates*). Setiap transformasi affine dapat direpresentasikan dalam sebuah matriks 4x4 pada koordinat homogen sebagai berikut:
 
-> $$\mathbf{A} = \begin{bmatrix} \alpha_{11} & \alpha_{12} & \alpha_{13} & \alpha_{14} \\ \alpha_{21} & \alpha_{22} & \alpha_{23} & \alpha_{24} \\ \alpha_{31} & \alpha_{32} & \alpha_{33} & \alpha_{34} \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+$$
+\mathbf{A} = \begin{bmatrix} \alpha_{11} & \alpha_{12} & \alpha_{13} & \alpha_{14} \\ \alpha_{21} & \alpha_{22} & \alpha_{23} & \alpha_{24} \\ \alpha_{31} & \alpha_{32} & \alpha_{33} & \alpha_{34} \\ 0 & 0 & 0 & 1 \end{bmatrix}
+$$
 
 Mari kita lihat detail ketiga transformasi tersebut:
 
 1.  Translation: hanya menampilkan translasi pada sumbu x, y, dan z. Secara umum, kita tahu bahwa translasi sejauh $t_x$, $t_y$, dan $t_z$ akan menghasilkan titik baru x’, y’, dan z’ pada titik awal x, y, dan z, terurut sebagai berikut:
 
-    $$x' = x + t_x, \quad y' = y + t_y, \quad z' = z + t_z$$
+$$
+x' = x + t_x, \quad y' = y + t_y, \quad z' = z + t_z
+$$
 
     Dalam koordinat homogen di ruang *affine*, kita bisa merepresentasikan **titik** dengan komponen terakhir 1 yaitu $[x \; y \; z \; 1]^T$atau **vektor** dengan komponen terakhir 0 yaitu $[x \; y \; z \; 0]^T$. Karena kasus ini kita membahas titik, maka transformasi tersebut dapat direpresentasikan dalam persamaan matriks berikut:
 
-    $$\begin{bmatrix} x' \\ y' \\ z' \\ 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & t_x \\ 0 & 1 & 0 & t_y \\ 0 & 0 & 1 & t_z \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ z \\ 1 \end{bmatrix}$$
+$$
+\begin{bmatrix} x' \\ y' \\ z' \\ 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & t_x \\ 0 & 1 & 0 & t_y \\ 0 & 0 & 1 & t_z \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ z \\ 1 \end{bmatrix}
+$$
 
     Matriks kedua tersebut dapat disebut sebagai *translation matrix* yang merepresentasikan perpindahan titik sejauh $t_x$, $t_y$, dan $t_z$ pada sumbu x, y, dan z.
 
@@ -214,7 +227,9 @@ Mari kita lihat detail ketiga transformasi tersebut:
 
     Mari kita bahas terlebih dahulu rotasi dalam *euler angles*. Rotasi 3D pada sumbu-z dapat diturunkan dari rotasi 2D (yang dimana berada pada plane xy dengan z konstan sehingga menghasilkan rotasi sumbu z), sehingga persamaannya adalah sebagai berikut:
 
-    $$x' = x\cos\theta - y\sin\theta, \quad y' = x\sin\theta + y\cos\theta, \quad z' = z,$$
+$$
+x' = x\cos\theta - y\sin\theta, \quad y' = x\sin\theta + y\cos\theta, \quad z' = z,
+$$
 
     Atau dalam persamaan matriks di koordinat homogen, sebuah titik p yang dirotasi terhadap sumbu-z sebesar *θ* menghasilkan titik p’ sebagai berikut:
 
@@ -222,7 +237,9 @@ Mari kita lihat detail ketiga transformasi tersebut:
 
     Kita juga bisa menurunkan matriks untuk rotasi dari sumbu x dan z dengan cara yang sama: rotasi sumbu-x akan membuat nilai x tidak berubah sehingga kita punya rotasi 2 dimensi dimana titik tersebut ber-rotasi pada bidang konstan di x. Rotasi sumbu-y juga sama, hanya nilai y saja yang tidak berubah.
 
-    $$\mathbf{R}_x = \mathbf{R}_x(\theta) = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & \cos\theta & -\sin\theta & 0 \\ 0 & \sin\theta & \cos\theta & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}, \quad \mathbf{R}_y = \mathbf{R}_y(\theta) = \begin{bmatrix} \cos\theta & 0 & \sin\theta & 0 \\ 0 & 1 & 0 & 0 \\ -\sin\theta & 0 & \cos\theta & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+$$
+\mathbf{R}_x = \mathbf{R}_x(\theta) = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & \cos\theta & -\sin\theta & 0 \\ 0 & \sin\theta & \cos\theta & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}, \quad \mathbf{R}_y = \mathbf{R}_y(\theta) = \begin{bmatrix} \cos\theta & 0 & \sin\theta & 0 \\ 0 & 1 & 0 & 0 \\ -\sin\theta & 0 & \cos\theta & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+$$
 
     Tanda dari fungsi sinus tersebut konsisten dengan definisi rotasi positif dalam kaidah tangan kanan (positif menandakan perputaran yang searah dengan kaidah tangan kanan).
 
@@ -242,13 +259,17 @@ Mari kita lihat detail ketiga transformasi tersebut:
 
     …pada koordinat homogen adalah sebagai berikut:
 
-    $$\begin{bmatrix} q_w^2 + q_x^2 - q_y^2 - q_z^2 & 2(q_xq_y - q_wq_z) & 2(q_wq_y + q_xq_z) & 0 \\ 2(q_xq_y + q_wq_z) & q_w^2 - q_x^2 + q_y^2 - q_z^2 & 2(q_yq_z - q_wq_x) & 0 \\ 2(q_xq_z - q_wq_y) & 2(q_wq_x + q_yq_z) & q_w^2 - q_x^2 - q_y^2 + q_z^2 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+$$
+\begin{bmatrix} q_w^2 + q_x^2 - q_y^2 - q_z^2 & 2(q_xq_y - q_wq_z) & 2(q_wq_y + q_xq_z) & 0 \\ 2(q_xq_y + q_wq_z) & q_w^2 - q_x^2 + q_y^2 - q_z^2 & 2(q_yq_z - q_wq_x) & 0 \\ 2(q_xq_z - q_wq_y) & 2(q_wq_x + q_yq_z) & q_w^2 - q_x^2 - q_y^2 + q_z^2 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+$$
 
     Buku Angel cukup menjelaskan penggunaan *quaternion* untuk rotasi. Selain itu, perlu ada fungsi untuk membantu memanipulasi *quaternion* dalam bentuk yang lebih *friendly*. Silahkan lihat implementation reference untuk mengetahui contoh implementasi. Jika ingin tahu lebih lanjut mengenai *euler angles* dapat dilihat pada artikel [*berikut*](https://starmanta.gitbooks.io/unitytipsredux/content/second-question.html) dan [*Wolfram MathWorld*](https://mathworld.wolfram.com/EulerAngles.html) serta *quaternion* pada video 3blue1brown [*berikut*](https://www.youtube.com/watch?v=d4EgbgTm0Bg) (ada versi interaktifnya juga).
 
 3.  Scaling memperbesar titik pada sumbu x, y, dan z sebesar $s_x$, $s_y$, dan $s_z$ menjadi x’, y’, z’ dengan persamaan berikut:
 
-    $$x' = xs_x, \quad y' = ys_y, \quad z' = zs_z$$
+$$
+x' = xs_x, \quad y' = ys_y, \quad z' = zs_z
+$$
 
     Dalam koordinat homogen, transformasi scaling dapat direpresentasikan dalam persamaan matriks berikut:
 
@@ -1008,7 +1029,9 @@ $\theta = arccos\left( \frac{z}{r} \right)$
 $\varphi = sgn(y)arccos\left( \frac{x}{\sqrt{x^{2} + y^{2}}} \right)$
 
 
-$$\operatorname{sgn} x := \begin{cases} -1 & \text{if } x < 0, \\ 0 & \text{if } x = 0, \\ 1 & \text{if } x > 0. \end{cases}$$
+$$
+\operatorname{sgn} x := \begin{cases} -1 & \text{if } x < 0, \\ 0 & \text{if } x = 0, \\ 1 & \text{if } x > 0. \end{cases}
+$$
 
 Kita punya titik pada permukaan bola, $\vec{p}$, artinya dipastikan jaraknya konstan selalu r, jadi kita cuma perlu tahu $\theta$ dan $\varphi$, Persamaan tersebut masih dalam bentuk $\theta$ dan $\varphi$, dan kita perlu mengubahnya ke dalam koordinat texel (s,t). Karena rentang nilai $\theta$ dan $\varphi$ adalah $0 \leq \theta \leq \pi$ dan $- \pi \leq \varphi \leq \pi$, sedangkan rentang s dan t adalah ($0 \leq s,t \leq 1$), dengan mengubah nilai $\theta$ menjadi s dan $\varphi$ menjadi t, maka kita bisa dapatkan:
 
@@ -1114,7 +1137,9 @@ vec3 L = u_lightDirection;
 Dalam sebuah ruangan, biasanya cahayanya telah didesain dan diposisikan sedemikian rupa sehingga memberikan pencahayaan yang sama rata (*uniform*) di sekitar ruangan. Pencahayaan yang *uniform* ini dapat kita sebut sebagai *ambient light*. Hal ini dapat kita modelkan dengan sebuah intensitas $I_{a}$ yang **sama persis** untuk seluruh titik pada objek. Karena kita memiliki tiga komponen warna: merah, hijau, dan biru, maka kita bisa representasikan $\overrightarrow{I_{a}}$ sebagai tiga komponen skalar $I_{a}$ yang terpisah untuk setiap komponen warna sebagai berikut:
 
 
-$$\mathbf{I}_{\mathrm{a}} = \begin{bmatrix} I_{\mathrm{ar}} \\ I_{\mathrm{ag}} \\ I_{\mathrm{ab}} \end{bmatrix}$$
+$$
+\mathbf{I}_{\mathrm{a}} = \begin{bmatrix} I_{\mathrm{ar}} \\ I_{\mathrm{ag}} \\ I_{\mathrm{ab}} \end{bmatrix}
+$$
 
 Cahaya ini hanya akan mempengaruhi $I_{a}$ dan tidak memiliki kontribusi pada *diffuse* ataupun *specular*.
 
@@ -1130,7 +1155,9 @@ $\mathbf{I}(\mathbf{p}_0) = \begin{bmatrix} I_r(\mathbf{p}_0) \\ I_g(\mathbf{p}_
 Intensitas cahaya yang diterima dari sebuah sumber cahaya titik akan berbanding terbalik dengan kuadrat dari jarak antara sumber cahaya ke permukaan (populer disebut sebagai [**inverse-square law**](https://en.wikipedia.org/wiki/Inverse-square_law)). Akibatnya, pada titik *p⃗* di permukaan (lihat gambar di atas), intensitas cahaya yang diterima oleh titik tersebut terhadap sumber cahaya titik pada $\overrightarrow{p_{0}}$ didefinisikan dengan matriks berikut:
 
 
-$$\mathrm{i}(\mathbf{p},\mathbf{p}_0) = \frac{1}{|\mathbf{p} - \mathbf{p}_0|^2}\,\mathrm{I}(\mathbf{p}_0)$$
+$$
+\mathrm{i}(\mathbf{p},\mathbf{p}_0) = \frac{1}{|\mathbf{p} - \mathbf{p}_0|^2}\,\mathrm{I}(\mathbf{p}_0)
+$$
 
 Sebuah objek yang dirender dengan sumber cahaya titik doang biasanya akan memiliki kontras yang tinggi dimana objek bisa terlihat sangat terang atau sangat gelap. Dapat dilihat pada gambar di bawah bahwa semua area bisa berada dalam seluruh bayangan (*umbra*) atau berada dalam sebagian bayangan (*penumbra*). Efek kontras tinggi ini dapat kita mitigasi dengan menambahkan *ambient light* pada *scene*.
 
@@ -1182,7 +1209,9 @@ float I = smoothstep(u_innerLimit, u_outerLimit, dot(L, u_lightDirection));
 
 Bisa dilihat bahwa kita menggunakan *smoothstep* untuk membuat ilusi distribusi cahaya yang berpusat pada tengah *cone*. *Smoothstep* menggunakan interpolasi *hermite*:
 
-$$smoothstep(a, b, x) = t^2(3 - 2t)$$
+$$
+smoothstep(a, b, x) = t^2(3 - 2t)
+$$
 
 dimana $\ t = clamp\left( \frac{x - a}{b - a},\ 0,\ 1 \right)$
 
@@ -1222,17 +1251,23 @@ $$\mathbf{R}_i = \begin{bmatrix} R_{\mathrm{ira}} & R_{\mathrm{iga}} & R_{\mathr
 Dengan demikian, kita bisa menghitung seluruh kontribusi dari setiap sumber dengan menambahkan komponen ambient, diffuse, dan specular. Sebagai contoh, intensitas warna merah pada suatu titik dari sumber cahaya i adalah:
 
 
-$$\begin{aligned} I_{\mathrm{ir}} &= R_{\mathrm{ira}}L_{\mathrm{ira}} + R_{\mathrm{ird}}L_{\mathrm{ird}} + R_{\mathrm{irs}}L_{\mathrm{irs}} \\ &= I_{\mathrm{ira}} + I_{\mathrm{ird}} + I_{\mathrm{irs}}. \end{aligned}$$
+$$
+\begin{aligned} I_{\mathrm{ir}} &= R_{\mathrm{ira}}L_{\mathrm{ira}} + R_{\mathrm{ird}}L_{\mathrm{ird}} + R_{\mathrm{irs}}L_{\mathrm{irs}} \\ &= I_{\mathrm{ira}} + I_{\mathrm{ird}} + I_{\mathrm{irs}}. \end{aligned}
+$$
 
 Total intensitas cahaya warna merah pada titik tersebut merupakan penjumlahan kontribusi warna merah untuk **semua** sumber cahaya, ditambah warna merah pada *global* *ambient* ($I_{ar}$), sehingga:
 
 
-$$I_{\mathrm{r}} = \sum_i \left(I_{\mathrm{ira}} + I_{\mathrm{ird}} + I_{\mathrm{irs}}\right) + I_{\mathrm{ar}},$$
+$$
+I_{\mathrm{r}} = \sum_i \left(I_{\mathrm{ira}} + I_{\mathrm{ird}} + I_{\mathrm{irs}}\right) + I_{\mathrm{ar}},
+$$
 
 Karena kita tahu perhitungan pada dasarnya sama saja untuk setiap sumber cahaya dan setiap komponen warna utama (hanya beda bergantung dari kita mempertimbangkan *ambient*, *diffuse*, atau *specular*), sehingga secara umum intensitas cahaya pada suatu titik dapat dihitung sebagai:
 
 
-$$I = I_{\mathrm{a}} + I_{\mathrm{d}} + I_{\mathrm{s}} = L_{\mathrm{a}}R_{\mathrm{a}} + L_{\mathrm{d}}R_{\mathrm{d}} + L_{\mathrm{s}}R_{\mathrm{s}}$$
+$$
+I = I_{\mathrm{a}} + I_{\mathrm{d}} + I_{\mathrm{s}} = L_{\mathrm{a}}R_{\mathrm{a}} + L_{\mathrm{d}}R_{\mathrm{d}} + L_{\mathrm{s}}R_{\mathrm{s}}
+$$
 
 Dimana perhitungan dilakukan untuk setiap komponen warna dan setiap sumber cahaya. *Global ambient* $I_{a}$ dapat ditambahkan di akhir jika diinginkan. *Global ambient* ini beda dengan yang per-material/per-light, anggap saja sebagai sumber cahaya tambahan yang berkontribusi untuk komponen *ambient* saja, biasa digunakan untuk mensimulasikan [*Global Illumination*](#-global-illumination). Persamaan lengkapnya dapat dilihat pada bagian akhir [**Specular Reflection**](#3223-specular-reflection) untuk Phong, atau [**Blinn-Phong**](#3224-modified-phong-model-blinn-phong-model).
 
@@ -1275,7 +1310,9 @@ Informasi lebih lanjut dan contoh implementasinya tentang hal ini dapat dilihat 
 Karena model Phong hanyalah aproksimasi dalam *object space*, rasanya akan sulit untuk mendapatkan pencahayaan yang diinginkan dengan mencocokkan komponen *ambient* setiap sumber cahaya atau membuat komponen *specular* dan *diffuse* berbeda nilainya. Perhitungan pada vertex shader dan fragment shader pada dasarnya hanya dilakukan dalam konteks objek (titik permukaan tersebut saja) sehingga kita tidak akan bisa mendapatkan informasi mengenai pantulan-pantulan cahaya dari objek-objek lainnya. Sayangnya, perhitungan untuk persamaan rendering secara global masih sulit untuk diselesaikan secara *real-time* (rendering 1 frame harus dilakukan dalam sub-1000/60 = 16.67 ms untuk game dengan frame rate 60 FPS).
 
 
-$$I(x,x') = g(x,x')\left[\epsilon(x,x') + \int_S \rho(x,x',x'')\,I(x',x'')\,dx''\right].$$
+$$
+I(x,x') = g(x,x')\left[\epsilon(x,x') + \int_S \rho(x,x',x'')\,I(x',x'')\,dx''\right].
+$$
 
 where:
 
@@ -1307,15 +1344,21 @@ Menurut hukum Lambert, kita hanya akan melihat komponen vertikal dari cahaya, se
 
 Dari gambar di atas, kita bisa tahu kalau Hukum Lambert mengatakan bahwa $R_{d} \propto \cos\theta$ (∝ adalah simbol berbanding terbalik / *inversely proportional*), dimana *θ* adalah sudut antara normal pada titik di permukaan (*n̂*) dan arah dari sumber cahaya (*l̂*), sehingga dengan *dot product*, didapatkan (ingat, unit vektor merupakan vektor dengan panjang 1, misalnya unit vektor dari *v⃗* ditulis sebagai *v̂*):
 
-$$\cos\theta = \hat{l} \cdot \hat{n}$$
+$$
+\cos\theta = \hat{l} \cdot \hat{n}
+$$
 
 Jika kita tambahkan koefisien pantulan diffuse, $R_{d} = k_{d}$, kita akan mendapatkan banyaknya intensitas cahaya pantulan *diffuse*
 
-$$I_{d} = k_{d}(\hat{l} \cdot \hat{n})L_{d}$$
+$$
+I_{d} = k_{d}(\hat{l} \cdot \hat{n})L_{d}
+$$
 
 Untuk sumber cahaya titik (bukan *directional*), biasanya kita juga akan menambahkan efek *inverse-square law* supaya semakin jauh titik permukaan dari sumber cahaya, maka semakin sedikit juga intensitas cahaya yang diterima. Biasanya, kita akan menggunakan *distance attenuation model* untuk hal ini, sehingga persamaannya menjadi:
 
-$$I_{d} = \frac{k_{d}}{a + bd + cd^{2}}\left( \hat{l} \cdot \hat{n} \right)L_{d}$$
+$$
+I_{d} = \frac{k_{d}}{a + bd + cd^{2}}\left( \hat{l} \cdot \hat{n} \right)L_{d}
+$$
 
 Akan tetapi, terdapat masalah dalam persamaan tersebut. Jika sumber cahaya berada di bawah permukaan, nilai $(\hat{l} \cdot \hat{n})L_{d}$ akan menjadi negatif. Oleh karena itu, kita perlu mengubah nilai negatif menjadi 0 dengan $\max((\hat{l} \cdot \hat{n})L_{d}, 0)$.
 
@@ -1331,7 +1374,9 @@ Kebalikan dari *diffuse* yang dicirikan sebagai permukaan kasar, permukaan *spec
 
 Untungnya, Phong memiliki model aproksimasi yang menambahkan pantulan *specular* dengan perhitungan yang tidak terlalu sulit dibandingkan dengan perhitungan *diffuse* sebelumnya. Banyaknya cahaya yang dilihat oleh pengamat (*viewer*) akan bergantung pada sudut *ϕ*, yaitu sudut antara arah pemantul sempurna, *r̂* (rumusnya ada di bagian awal [*Shading Model*](#322-shading-model-phong-reflection-model)), dengan arah titik dari permukaan ke pengamat, *v̂*. Model Phong menggunakan persamaan berikut:
 
-$$I_{s} = k_{s}L_{s}\cos^{\alpha} \phi$$
+$$
+I_{s} = k_{s}L_{s}\cos^{\alpha} \phi
+$$
 
 Dimana koefisien $k_{s}$ ($k_{s} = R_{s}$, $0 \leq k_{s} \leq 1$) merupakan banyaknya cahaya *specular* datang yang dipantulkan, eksponen *α* merupakan koefisien *shininess*. Semakin tinggi *α*, maka cahaya yang dipantulkan akan berkumpul pada sudut sekitar sudut pemantul sempurna (garis di tengah pada gambar di bawah). Ketika *α* mendekati tak terhingga, yakni $\lim_{\alpha \to \infty}(\cos^{\alpha} \phi)$, maka nilainya menjadi 0 (sudut pantulan = sudut pemantul sempurna) sehingga kita akan mendapatkan cermin. Biasanya, nilai *α* yang kecil ($\alpha < 100$) digunakan untuk material yang menampilkan *highlight* yang lebih lebar, sedangkan nilai *α* pada rentang 100 hingga 500 digunakan untuk kebanyakan permukaan logam (metalik).
 
@@ -1339,11 +1384,15 @@ Dimana koefisien $k_{s}$ ($k_{s} = R_{s}$, $0 \leq k_{s} \leq 1$) merupakan bany
 
 Tentu, kita bisa mengganti $\cos\phi$ dengan *dot product* *r̂* dan *v̂*, dan jangan lupa untuk mengganti nilai negatif menjadi nol, sehingga didapatkan persamaan berikut:
 
-$$I_{s} = k_{s}L_{s}\max((\hat{r} \cdot \hat{v})^{\alpha}, 0)$$
+$$
+I_{s} = k_{s}L_{s}\max((\hat{r} \cdot \hat{v})^{\alpha}, 0)
+$$
 
 Selain itu, kita juga bisa menambahkan efek *inverse-square law* untuk **sumber cahaya titik** seperti pantulan *diffuse*, sehingga persamaan Phong untuk mendapatkan intensitas cahaya dari sebuah titik **p** pada permukaan dapat dituliskan sebagai berikut:
 
-$$I = \frac{1}{a + bd + cd^{2}}\left( k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right) + k_{s}L_{s}\max\left( \left( \hat{r} \cdot \hat{v} \right)^{\alpha},\ 0 \right) \right) + k_{a}L_{a}$$
+$$
+I = \frac{1}{a + bd + cd^{2}}\left( k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right) + k_{s}L_{s}\max\left( \left( \hat{r} \cdot \hat{v} \right)^{\alpha},\ 0 \right) \right) + k_{a}L_{a}
+$$
 
 Perhitungan ini dilakukan untuk setiap sumber cahaya dan setiap komponen warna (biasanya dalam glsl, *k* dan *L* dalam bentuk `vec4` sehingga perhitungan otomatis untuk setiap komponen warna karena operator perkalian `vec4` dengan `vec4` dilakukan secara [**component-wise**](https://en.wikibooks.org/wiki/GLSL_Programming/Vector_and_Matrix_Operations#Operators)). Attenuation dengan distance attenuation model bisa diabaikan (dianggap 1) jika menggunakan sumber cahaya paralel seperti *directional light*. Kita juga bisa menambahkan *global ambient* $L_{a}$ di akhir perhitungan.
 
@@ -1351,7 +1400,9 @@ Perhitungan ini dilakukan untuk setiap sumber cahaya dan setiap komponen warna (
 
 Dalam perhitungan pantulan *specular*, kita bisa melakukan aproksimasi lebih lanjut dengan menggunakan *unit vector* pertengahan (*halfway*) antara vektor pengamat *v̂* dengan vektor sumber cahaya *l̂*:
 
-$$\hat{h} = \frac{\hat{l} + \hat{v}}{\left| \hat{l} + \hat{v} \right|} = normalize(l + v)$$
+$$
+\hat{h} = \frac{\hat{l} + \hat{v}}{\left| \hat{l} + \hat{v} \right|} = normalize(l + v)
+$$
 
 Kita definisikan *ψ* sebagai sudut antara *n̂* dengan *ĥ* atau disebut sebagai *halfway angle*. Ketika *v̂* berada pada *plane* yang sama (*coplanar*) dengan *l̂*, *n̂*, dan *r̂*, kita bisa tahu bahwa $2\psi = \phi$. Oleh karena itu, kita bisa mengganti $\hat{r} \cdot \hat{v}$ dengan $\hat{n} \cdot \hat{h}$ sehingga tidak perlu menghitung *r̂*. Akan tetapi, sudut *halfway* *ψ* lebih kecil daripada *ϕ*, dan jika kita memakai eksponen *e* pada $(\hat{n} \cdot \hat{h})^{e}$ yang sama dengan eksponen *e* pada $(\hat{r} \cdot \hat{v})^{e}$, maka ukuran dari *specular highlights* akan lebih kecil. Akibatnya, kita perlu mengganti nilai eksponen *e* dengan nilai $e'$ sehingga $(\hat{n} \cdot \hat{h})^{e'}$ akan mendekati nilai yang sama dengan $(\hat{r} \cdot \hat{v})^{e}$.
 
@@ -1359,11 +1410,15 @@ Kita definisikan *ψ* sebagai sudut antara *n̂* dengan *ĥ* atau disebut sebag
 
 Dapat disimpulkan, perhitungan intensitas cahaya yang diterima oleh titik di permukaan dengan model Blinn-Phong dapat dilakukan dengan persamaan berikut:
 
-$$I = \frac{1}{a + bd + cd^{2}}\left( k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right) + k_{s}L_{s}\max\left( \left( \hat{n} \cdot \hat{h} \right)^{e'},\ 0 \right) \right) + k_{a}L_{a}$$
+$$
+I = \frac{1}{a + bd + cd^{2}}\left( k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right) + k_{s}L_{s}\max\left( \left( \hat{n} \cdot \hat{h} \right)^{e'},\ 0 \right) \right) + k_{a}L_{a}
+$$
 
 Atau secara umum,
 
-$$I = attenuation\ (diffuse\ term + specular\ term) + ambient\ term$$
+$$
+I = attenuation\ (diffuse\ term + specular\ term) + ambient\ term
+$$
 
 Perhitungan ini dapat dilakukan pada vertex maupun fragment shader, dan bisa dilakukan dalam *space* manapun (*world, view*, atau *tangent*), namun pastikan semua posisi dan arah (normal titik permukaan, posisi titik permukaan, posisi/arah cahaya, posisi kamera) memiliki *space* yang sama. Kebanyakan literatur dan referensi menggunakan *view space* sehingga posisi kamera akan menjadi origin (`camPos = (0,0,0)`). Apapun itu, sing penting *konsisten*!! (*also* *please be* *aware* sama yang ditulis di kode :D)
 
@@ -1616,7 +1671,9 @@ Objek pada dunia nyata memiliki detail dan bentuk yang kompleks. Shading model s
 
 Diffuse map merupakan sebuah tekstur yang merepresentasikan warna *diffuse* berdasarkan posisi setiap *fragment* (piksel) dalam objek. Nama lain dari tekstur ini adalah *albedo*, meskipun beberapa mengatakan bahwa *albedo* hanya warna dasar asli dari objek, sedangkan *diffuse* merupakan albedo sekaligus shading dari pantulan *diffuse* (*but we’re not going to be that pedantic here*). Untuk melakukan *blending* terhadap *diffuse map*, kita bisa melakukan sampling nilai teksturnya dan mengalikan-nya dengan *diffuse term* sehingga perhitungan pantulan diffuse menjadi:
 
-$$k_{d}L_{d}\max((\hat{l} \cdot \hat{n}), 0)m_{d}$$
+$$
+k_{d}L_{d}\max((\hat{l} \cdot \hat{n}), 0)m_{d}
+$$
 
 Dimana $m_{d}$ merupakan warna (ingat, tiga warna primer: merah, hijau, dan biru) yang merupakan hasil sampling *diffuse map* pada koordinat tekstur di vertex atau fragment tersebut.
 
@@ -1634,7 +1691,9 @@ Dapat dilihat, bagian besi di tepi kotak terdapat warna putih sebagian menandaka
 
 Melakukan *blending* terhadap *specular map* sebenarnya sama seperti *diffuse map*, hanya saja kita akan memakai bagian perhitungan specular. Kita bisa melakukan sampling nilai *specular map* dan mengalikan-nya dengan *term* *specular* sehingga perhitungan pantulan specular menjadi (dengan model Blinn-Phong):
 
-$$k_{s}L_{s}\max((\hat{n} \cdot \hat{h})^{e'}, 0)m_{s}$$
+$$
+k_{s}L_{s}\max((\hat{n} \cdot \hat{h})^{e'}, 0)m_{s}
+$$
 
 Dimana $m_{s}$ merupakan kecerahan piksel yang merupakan hasil sampling specular *map* pada koordinat tekstur di vertex atau fragment tersebut. Pada WebGL, kamu bisa menggunakan format `gl.LUMINANCE` atau `gl.RGB` (dengan tipe data `gl.UNSIGNED_BYTE`), selama perhitungannya benar. Mungkin diperlukan *swizzle* pada perhitungan di GLSL seperti `.rrr`, `.ggg`, atau `.bbb`, tergantung dari channel yang dipakai untuk *grayscale* (biasanya kalau RGB, nilai pada ketiga channel akan sama), yang penting jangan lupa kalau perkaliannya harus punya size yang sama (biasanya akan error kalau tipe data mismatch dsb). Anyway, kotak kayu tadi setelah diaplikasikan *specular map* akan menjadi seperti ini:
 
@@ -1652,11 +1711,15 @@ Bentuk-bentuk kecil (bahkan bisa berukuran sekitar lebih kecil dari 1 piksel) da
 
 Misalkan kita punya sebuah vertex pada posisi *p* yaitu (x,y,z). Kita ingin memindahkan vertex searah dengan arah normal (*n̂*) vertex tersebut sejauh *f* sehingga posisi vertex menjadi $p'$ yaitu (x’,y’,z’), maka kita dapat menghitungnya dengan:
 
-$$p' = p + df\hat{n}$$
+$$
+p' = p + df\hat{n}
+$$
 
 Dimana *d* merupakan persentase perubahan posisi (dari 0 hingga 1, e.g. jika 1 akan berpindah sejauh *f*) dari hasil sampling kecerahan piksel pada *displacement map* sesuai dengan koordinat tekstur *vertex*. Nilai *f* inilah yang dapat kita sebut sebagai *displacement scale*. Karena normal memiliki panjang vektor 1, maka *f* mengatur jarak perpindahan vertex tersebut. Terkadang, kita juga butuh parameter *displacement bias*, anggap saja *b*, dimana kita akan melakukan *offset* atau mengubah titik awal dari normal vertex tersebut, sehingga
 
-$$p' = p + (df + b)\hat{n}$$
+$$
+p' = p + (df + b)\hat{n}
+$$
 
 Dimana $b > 0$ akan “memajukan” *normal* sejauh *b* atau $b < 0$ akan “memundurkan” *normal* sejauh *b*.
 
@@ -1684,9 +1747,13 @@ Akan tetapi, cara tersebut tetap menghasilkan *vertex* yang banyak. Bagaimana ji
 
 Karena normal merupakan vektor unit (panjang vektor 1), maka range nilai komponennya berada pada rentang \[-1, 1\], Akan tetapi, karena komponen warna pada tekstur disimpan dalam range \[0, 1\], kita perlu melakukan konversi terlebih dahulu. Konversi antara komponen x,y,z normal dengan komponen warna r,g,b normal map dan sebaliknya bisa dilakukan dengan rumus:
 
-$$normalMap.rgb = normal.xyz * 0.5 + 0.5$$
+$$
+normalMap.rgb = normal.xyz * 0.5 + 0.5
+$$
 
-$$normal.xyz = (normalMap.rgb - 0.5) / 0.5 = 2.0 * normalMap.rgb - 1.0$$
+$$
+normal.xyz = (normalMap.rgb - 0.5) / 0.5 = 2.0 * normalMap.rgb - 1.0
+$$
 
 *Tangent space* merupakan koordinat yang lokal terhadap permukaan *triangle*, sehingga normal relatif terhadap local space dari setiap triangle. Bayangkan seperti *local space* dari vektor pada *normal map*, mereka semua mengarah pada arah positif z, tidak peduli arah transformasi akhirnya. Kita bisa saja memakai normal map secara langsung misalnya pada sebuah *plane* yang menghadap ke sumbu z positif menggunakan kode GLSL berikut
 
@@ -1720,9 +1787,13 @@ Untuk membawa vektor normal pada *normal map* dari *local tangent space* ke *wor
 
 Misalnya, kita punya sebuah segitiga dengan posisi verticesnya yaitu *P*₁, *P*₂, dan *P*₃ yang masing-masing memiliki koordinat tekstur (*U*₁, *V*₁), (*U*₂, *V*₂), dan (*U*₃, *V*₃). Dari ketiga titik tersebut, kita bisa mendapatkan vektor *edge* atau tepi yaitu *E*₁ dan *E*₂. Tepi *E*₁ dan *E*₂ dapat kita tuliskan sebagai kombinasi linear dari *T* (warna merah) dan *B* (warna hijau). Sebagai contoh, *E*₂ direpresentasikan sebagai *T* dengan panjang *ΔU*₂ dan *B* dengan panjang *ΔV*₂, sehingga kombinasi linearnya adalah $\Delta U_{2}T + \Delta V_{2}B$. Begitu pula untuk *E*₁, sehingga kombinasi linear keduanya adalah sebagai berikut:
 
-$$E_{1} = \Delta U_{1}T + \Delta V_{1}B$$
+$$
+E_{1} = \Delta U_{1}T + \Delta V_{1}B
+$$
 
-$$E_{2} = \Delta U_{2}T + \Delta V_{2}B$$
+$$
+E_{2} = \Delta U_{2}T + \Delta V_{2}B
+$$
 
 Karena *E*, *T*, dan *B* memiliki tiga komponen (x, y, z), maka kita juga bisa menuliskannya sebagai:
 
@@ -2337,7 +2408,9 @@ export class BasicMaterial extends ShaderMaterial {
 
 Nah sekarang coba kita buat `PhongMaterial` menggunakan Phong-Blinn. Material ini akan memiliki warna ambient (koefisien ambient $k_{a}$), warna diffuse (koefisien diffuse $k_{d}$), warna specular (koefisien specular $k_{s}$) dan shininess (eksponen $e'$). Selain itu, material ini juga memiliki tekstur diffuse (sampler $m_{d}$), tekstur specular (sampler $m_{s}$), tekstur displacement (sampler $d$), dan tekstur normal (sampler $n$). Sama seperti `BasicMaterial`, cahaya hanya memiliki satu konfigurasi warna untuk koefisien ambient saja. Mari kita lihat kembali persamaan intensitas cahaya untuk Phong-Blinn (ditambah dengan Diffuse serta Specular *map*):
 
-$$I = \frac{1}{a + bd + cd^{2}}\left( k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right)m_{d} + k_{s}L_{s}\max\left( \left( \hat{n} \cdot \hat{h} \right)^{e'},\ 0 \right)m_{s} \right) + k_{a}L_{a}$$
+$$
+I = \frac{1}{a + bd + cd^{2}}\left( k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right)m_{d} + k_{s}L_{s}\max\left( \left( \hat{n} \cdot \hat{h} \right)^{e'},\ 0 \right)m_{s} \right) + k_{a}L_{a}
+$$
 
 ##### 3.3.2.4.1. Asumsi Implementasi
 
@@ -2371,23 +2444,33 @@ Kita tahu bahwa vektor tangent $\hat{t}$ didefinisikan sebagai perbedaan antara 
 
 Kita tahu bahwa tangent dan normal saling tegak lurus, sehingga cosinus sudutnya adalah 0 (cos(90deg) = 0), atau secara matematis, $\hat{t} \cdot \hat{n} = 0$. Begitu juga setelah transformasi, sudut antara tangent dan normal tetap sama, sehingga $\widehat{t'} \cdot \widehat{n'} = 0$. Maka, persamaan berikut sudah pasti benar:
 
-$$\hat{t} \cdot \hat{n} = \widehat{t'} \cdot \widehat{n'} = 0$$
+$$
+\hat{t} \cdot \hat{n} = \widehat{t'} \cdot \widehat{n'} = 0
+$$
 
 Kita tahu bahwa $\hat{t}$ merupakan vektor dimana pada koordinat homogen memiliki w = 0, sehingga dapat dikali dengan 3x3 submatriks kiri atas (bagian translasi dihilangkan) dari matriks `worldMatrix`, sebut saja submatriks tersebut sebagai **M**. Asumsikan normal matriks adalah **N**, dan kita tahu $\hat{n}$ juga merupakan vektor sehingga **N** merupakan matriks 3x3, sedemikian rupa sehingga:
 
-$$\widehat{n'} \cdot \widehat{t'} = (N\hat{n}) \cdot (M\hat{t}) = 0$$
+$$
+\widehat{n'} \cdot \widehat{t'} = (N\hat{n}) \cdot (M\hat{t}) = 0
+$$
 
 Dimana $n'$ dan $t'$ merupakan normal dan tangent pada *world space*, serta $n$ dan $t$ merupakan normal dan tangent pada *tangent space*. Kita bisa menuliskannya sebagai perkalian matriks ($\vec{u} \cdot \vec{v} = u.x \times v.x + u.y \times v.y = \lbrack u.x,\ u.y\rbrack{\lbrack v.x,\ v.y\rbrack}^{T} = uv^{T}$ jika u dan v adalah vektor baris. Karena kita bicara WebGL dimana u dan v adalah vektor kolom, maka $u^{T}v$), sehingga:
 
-$$(N\hat{n}) \cdot (M\hat{t}) = (Nn)^{T}(Mt) = 0$$
+$$
+(N\hat{n}) \cdot (M\hat{t}) = (Nn)^{T}(Mt) = 0
+$$
 
 Kita bisa memasukkan transposenya ke dalam, sehingga:
 
-$$(Nn)^{T}(Mt) = n^{T}N^{T}Mt = 0$$
+$$
+(Nn)^{T}(Mt) = n^{T}N^{T}Mt = 0
+$$
 
 Supaya persamaan awal yang kita tahu, $\hat{t} \cdot \hat{n} = \widehat{t'} \cdot \widehat{n'} = 0$, tetap valid, maka persamaan berikut harus dipenuhi:
 
-$$n^{T}N^{T}Mt = 0$$
+$$
+n^{T}N^{T}Mt = 0
+$$
 
 Supaya persamaan tersebut terpenuhi, satu-satunya cara adalah membuat $N^{T}M = I$, sehingga $n^{T}N^{T}Mt = n^{T}It = n^{T}t = \hat{n} \cdot \hat{t} = 0$, akhirnya menjadi persamaan awal yang sudah pasti valid.
 
@@ -2536,7 +2619,9 @@ Selanjutnya, kita akan mulai menghitung cahaya. Kita akan buat satu-satu terlebi
 
 1.  Ambient
 
-$$I_{a} = k_{a}L_{a}$$
+$$
+I_{a} = k_{a}L_{a}
+$$
 
 > Cukup straightforward.
 >
@@ -2549,7 +2634,9 @@ $$I_{a} = k_{a}L_{a}$$
 
 2.  Diffuse
 
-$$I_{d} = k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right)m_{d}$$
+$$
+I_{d} = k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right)m_{d}
+$$
 
 > Kita akan gunakan dot product dari L dan N yang telah dihitung sebelumnya, lalu mengambil nilai positifnya. Selanjutnya, kita kalikan dengan warna diffuse dan warna dari sample diffuse map. $L_{d}$ bisa kita anggap (1,1,1,1).
 >
@@ -2564,7 +2651,9 @@ $$I_{d} = k_{d}L_{d}\max\left( \left( \hat{l} \cdot \hat{n} \right),\ 0 \right)m
 
 3.  Specular
 
-$$I_{s} = k_{s}L_{s}\max\left( \left( \hat{n} \cdot \hat{h} \right)^{e'},\ 0 \right)m_{s}$$
+$$
+I_{s} = k_{s}L_{s}\max\left( \left( \hat{n} \cdot \hat{h} \right)^{e'},\ 0 \right)m_{s}
+$$
 
 > Kita akan gunakan dot product dari N dan H yang telah dihitung sebelumnya, lalu mengambil nilai positifnya (kita akan max terlebih dahulu untuk menghindari pow dengan nilai negatif), kemudian pangkatkan nilainya dengan shininess. Selanjutnya, kita kalikan dengan warna specular dan warna dari sample specular map. $L_{s}$ bisa kita anggap (1,1,1,1).
 >
@@ -2580,7 +2669,9 @@ $$I_{s} = k_{s}L_{s}\max\left( \left( \hat{n} \cdot \hat{h} \right)^{e'},\ 0 \ri
 
 Setelah itu, kita bisa menggabungkannya dengan
 
-$$I = attenuation(diffuse + specular) + ambient$$
+$$
+I = attenuation(diffuse + specular) + ambient
+$$
 
 Karena kita menggunakan directional light, attenuation selalu bernilai 1. Berikut adalah kode fragment shader secara lengkap:
 
@@ -2820,7 +2911,9 @@ Dalam grafika komputer, proyeksi ortografi biasa didefinisikan dalam 6 tupel (le
 Pada *homogeneous coordinate*, proyeksi ini dapat didefinisikan dalam matriks yang disebut sebagai *projection matrix* dengan nilai sebagai berikut (jangan lupa [*asumsi matriks*](#2-aturan-matriks-dalam-matematika-vs-webgl))
 
 
-$$\begin{bmatrix} \frac{2}{right-left} & 0 & 0 & -\frac{right+left}{right-left} \\ 0 & \frac{2}{top-bottom} & 0 & -\frac{top+bottom}{top-bottom} \\ 0 & 0 & -\frac{2}{far-near} & -\frac{far+near}{far-near} \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+$$
+\begin{bmatrix} \dfrac{2}{right-left} & 0 & 0 & -\frac{right+left}{right-left} \\ 0 & \dfrac{2}{top-bottom} & 0 & -\frac{top+bottom}{top-bottom} \\ 0 & 0 & -\dfrac{2}{far-near} & -\dfrac{far+near}{far-near} \\ 0 & 0 & 0 & 1 \end{bmatrix}
+$$
 
 Penurunan matriks ini dapat dilihat pada buku Angel, Interactive Computer Graphics 7th Ed. bagian 5.4.4 Orthogonal Projection Matrices pp. 237 (tl;dr dimulai dari identity projection, yaitu semua tupel bernilai 1 atau -1, merupakan clipping sesuai [*NDC*](#3-sistem-koordinat-clip-space-di-webgl), kemudian transformasi translasi dan scaling sehingga sesuai dengan nilai tupel yang diinginkan).
 
@@ -2841,7 +2934,9 @@ $$\begin{bmatrix} 1 & 0 & \cot\theta & 0 \\ 0 & 1 & \cot\phi & 0 \\ 0 & 0 & 1 & 
 Kemudian ST adalah transformasi translasi dan scaling dari proyeksi ortografi sebelumnya:
 
 
-$$\mathbf{ST} = \begin{bmatrix} \frac{2}{right-left} & 0 & 0 & -\frac{right+left}{right-left} \\ 0 & \frac{2}{top-bottom} & 0 & -\frac{top+bottom}{top-bottom} \\ 0 & 0 & -\frac{2}{far-near} & -\frac{far+near}{near-far} \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+$$
+\mathbf{ST} = \begin{bmatrix} \dfrac{2}{right-left} & 0 & 0 & -\frac{right+left}{right-left} \\ 0 & \dfrac{2}{top-bottom} & 0 & -\frac{top+bottom}{top-bottom} \\ 0 & 0 & -\dfrac{2}{far-near} & -\frac{far+near}{near-far} \\ 0 & 0 & 0 & 1 \end{bmatrix}
+$$
 
 Dan terakhir $M_{ortho}$ merupakan transformasi matriks untuk proyeksi ortografik secara umum pada *plane* z = 0 sebagai berikut:
 
@@ -2872,7 +2967,9 @@ Dalam grafika komputer, proyeksi perspektif biasa didefinisikan dalam 4 tuple *f
 fovy merupakan *setengah* sudut antara top dan bottom planes dari *view volume* dalam radian (rentang nilai dari 0 hingga *π*/2), sedangkan aspect merupakan aspect ratio dari ukuran *plane*, yaitu $\frac{width}{height}$ dari canvas di WebGL. Proyeksi perspektif dapat dihasilkan dengan matriks proyeksi berikut:
 
 
-$$\begin{bmatrix} \frac{near}{right} & 0 & 0 & 0 \\ 0 & \frac{near}{top} & 0 & 0 \\ 0 & 0 & -\frac{far+near}{far-near} & -\frac{2\,far\,near}{far-near} \\ 0 & 0 & -1 & 0 \end{bmatrix}$$
+$$
+\begin{bmatrix} \dfrac{near}{right} & 0 & 0 & 0 \\ 0 & \dfrac{near}{top} & 0 & 0 \\ 0 & 0 & -\dfrac{far+near}{far-near} & -\dfrac{2\,far\,near}{far-near} \\ 0 & 0 & -1 & 0 \end{bmatrix}
+$$
 
 Dimana kita dapat hitung dengan trigonometri
 

@@ -378,6 +378,10 @@
 	padding: 0.6em 0.25em;
 }
 
+.katex-display > .katex {
+	white-space: nowrap;
+}
+
 .post-body details {
 	border: 1px solid var(--border);
 	padding: 0.7rem 1rem;
@@ -501,14 +505,16 @@
 	}
 }
 
-/* figures authored for light backgrounds stay legible in dark mode */
+/* figures authored for light backgrounds stay legible in dark mode: the plate is the
+   image box itself, no padding, so the layout is identical in both themes */
+.doc-figure {
+	background: transparent;
+}
 :root[data-theme='dark'] .doc-figure {
 	background: #f4f9fb;
-	padding: 10px;
 }
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) .doc-figure {
 		background: #f4f9fb;
-		padding: 10px;
 	}
 }

@@ -32,17 +32,18 @@
 	--heading: light-dark(#1d9b80, #26ceaa);
 	--purple: light-dark(#3d1a78, #c9b3ff);
 
-	/* code theme (VS-like roles, our palette): keyword=indigo, string=teal, number=amber,
-	   type=blue, function=purple; all pass AA on --code-bg */
+	/* code theme: VS Dark+/Light+ expressiveness, hues derived from the palette
+	   (indigo base; teal analogous; amber complementary; coral + mint triadic accents) */
 	--code-keyword: light-dark(#5049cc, #a9b1ff);
-	--code-string: light-dark(#066f59, #4fe0bd);
-	--code-comment: light-dark(#4c6270, #a49fc6);
-	--code-number: light-dark(#9a4f06, #f2b35e);
-	--code-type: light-dark(#2a63ad, #7bade2);
-	--code-function: light-dark(#3d1a78, #c9b3ff);
-	--code-constant: light-dark(#2a63ad, #8db4ff);
+	--code-string: light-dark(#a3311c, #e8a07a);
+	--code-comment: light-dark(#3c7a3c, #6a9955);
+	--code-number: light-dark(#056e46, #b5cea8);
+	--code-type: light-dark(#0b6e5d, #4ec9b0);
+	--code-function: light-dark(#795e26, #dcdcaa);
+	--code-constant: light-dark(#005fbf, #4fc1ff);
+	--code-variable: light-dark(#1a4a9e, #9cdcfe);
 	--code-operator: light-dark(#333c52, #c8cfe4);
-	--code-regexp: light-dark(#9a4f06, #f2b35e);
+	--code-regexp: light-dark(#a3235e, #d16969);
 
 	--code-bg: light-dark(#e8f1f5, #17122b);
 	--mark: light-dark(#fdeea8, #5b4a12);
