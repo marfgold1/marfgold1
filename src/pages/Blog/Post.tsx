@@ -4,7 +4,6 @@ import { getPost, formatDate, type PostMeta } from '@/lib/blog.js';
 import { markUsed } from '@/lib/chunk-usage.js';
 import { startReading, scrollToHeading } from '@/lib/reading.js';
 import { mdxComponents } from '@/components/mdx/index.js';
-import { ProgressRuler } from '@/components/ProgressRuler.jsx';
 import { Toc } from '@/components/Toc.jsx';
 import { NotFound } from '@/pages/_404.jsx';
 
@@ -43,7 +42,7 @@ function PostView({ post }: { post: PostMeta }) {
 	const Content = load(slug);
 	const article = useRef<HTMLElement>(null);
 
-	// Reading progress (mobile bar and desktop ruler) follows this article.
+	// The reading bar (phones/tablets) and TOC (desktop) follow this article.
 	useEffect(() => (article.current ? startReading(article.current, post.title) : undefined), [slug]);
 
 	return (
@@ -70,7 +69,6 @@ function PostView({ post }: { post: PostMeta }) {
 					</ErrorBoundary>
 				</div>
 			</article>
-			<ProgressRuler />
 		</>
 	);
 }

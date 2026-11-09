@@ -24,18 +24,14 @@ export interface Reading {
 	current: number;
 	/** 0..1, measured over the article itself (0 when it starts, 1 when its end is in view) */
 	progress: number;
-	/** reading position along the article (0..1, clamped), on the same axis as Heading.p */
-	at: number;
 	/** false when the article fits on one screen, so there is nothing to track */
 	scrollable: boolean;
 }
 
-const IDLE: Reading = { active: false, title: '', headings: [], current: -1, progress: 0, at: 0, scrollable: false };
+const IDLE: Reading = { active: false, title: '', headings: [], current: -1, progress: 0, scrollable: false };
 
 /** a heading counts as "current" once its top is within this many px of the viewport top */
 const REACHED_AT = 110;
-/** the ruler's reading line: this fraction of the way down the viewport */
-const READING_LINE = 0.3;
 
 let state = IDLE;
 const subscribers = new Set<(s: Reading) => void>();
@@ -60,11 +56,6 @@ export function useReading(): Reading {
 
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
-let seekImpl: (p: number) => void = () => {};
-
-/** Scroll so that position `p` (0..1 along the article) sits on the reading line. */
-export const seekTo = (p: number) => seekImpl(p);
-
 /** Start tracking `root` (the <article>). Returns a cleanup function. */
 export function startReading(root: HTMLElement, title: string): () => void {
 	let headings: Heading[] = [];
@@ -82,14 +73,12 @@ export function startReading(root: HTMLElement, title: string): () => void {
 			if (headings[i].y - scrollY <= REACHED_AT) current = i;
 			else break;
 		}
-		const atEnd = span > 0 && scrollY >= start + span - 1;
 		publish({
 			active: true,
 			title,
 			headings,
 			current,
 			progress: span > 0 ? clamp01((scrollY - start) / span) : 0,
-			at: atEnd ? 1 : clamp01((scrollY + innerHeight * READING_LINE - start) / height),
 			scrollable: span > 0,
 		});
 	};
@@ -116,12 +105,6 @@ export function startReading(root: HTMLElement, title: string): () => void {
 		schedule();
 	};
 
-	seekImpl = (p) => {
-		const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-		const top = Math.max(0, start + p * height - innerHeight * READING_LINE);
-		scrollTo({ top, behavior: calm ? 'auto' : 'smooth' });
-	};
-
 	const mutations = new MutationObserver(measure);
 	mutations.observe(root, { childList: true, subtree: true });
 	const sizes = new ResizeObserver(measure);
@@ -137,7 +120,6 @@ export function startReading(root: HTMLElement, title: string): () => void {
 		removeEventListener('scroll', schedule);
 		removeEventListener('resize', measure);
 		if (frame) cancelAnimationFrame(frame);
-		seekImpl = () => {};
 		publish(IDLE);
 	};
 }

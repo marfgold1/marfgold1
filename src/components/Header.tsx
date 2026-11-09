@@ -10,14 +10,13 @@ export function Header() {
 	const el = useRef<HTMLElement>(null);
 	const top = useRef<HTMLDivElement>(null);
 	const [hidden, setHidden] = useState(false);
-	const hiddenRef = useRef(false);
-	hiddenRef.current = hidden;
 	const [open, setOpen] = useState(false);
 	const openRef = useRef(false);
 	openRef.current = open;
+	const hiddenRef = useRef(false);
+	hiddenRef.current = hidden;
 
-	// Phones: the header is fixed and slides away while scrolling down, back on scroll up.
-	// (CSS only applies it at phone width.) The reading bar, when present, stays pinned.
+	// The header is fixed everywhere and slides away while scrolling down, back on scroll up.
 	useEffect(() => {
 		let last = scrollY;
 		const onScroll = () => {
@@ -28,9 +27,6 @@ export function Header() {
 			else if (dy > 6 && !openRef.current) next = true;
 			else if (dy < -6) next = false;
 			if (next !== hiddenRef.current) setHidden(next);
-			// TOC and the ruler use this to extend into the freed-up space
-			if (next) document.documentElement.setAttribute('data-header-hidden', '');
-			else document.documentElement.removeAttribute('data-header-hidden');
 			last = y;
 		};
 		addEventListener('scroll', onScroll, { passive: true });
@@ -48,12 +44,6 @@ export function Header() {
 		top.current && ro.observe(top.current);
 		return () => ro.disconnect();
 	}, []);
-
-	// keep the html attribute (TOC/ruler extension) in sync with whatever sets the state
-	useEffect(() => {
-		if (hidden) document.documentElement.setAttribute('data-header-hidden', '');
-		else document.documentElement.removeAttribute('data-header-hidden');
-	}, [hidden]);
 
 	useEffect(() => setOpen(false), [url]);
 	useEffect(() => {
