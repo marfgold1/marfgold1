@@ -10,6 +10,8 @@ export function Header() {
 	const el = useRef<HTMLElement>(null);
 	const top = useRef<HTMLDivElement>(null);
 	const [hidden, setHidden] = useState(false);
+	const hiddenRef = useRef(false);
+	hiddenRef.current = hidden;
 	const [open, setOpen] = useState(false);
 	const openRef = useRef(false);
 	openRef.current = open;
@@ -21,9 +23,14 @@ export function Header() {
 		const onScroll = () => {
 			const y = scrollY;
 			const dy = y - last;
-			if (y < 8) setHidden(false);
-			else if (dy > 6 && !openRef.current) setHidden(true);
-			else if (dy < -6) setHidden(false);
+			let next = hiddenRef.current;
+			if (y < 8) next = false;
+			else if (dy > 6 && !openRef.current) next = true;
+			else if (dy < -6) next = false;
+			if (next !== hiddenRef.current) setHidden(next);
+			// TOC and the ruler use this to extend into the freed-up space
+			if (next) document.documentElement.setAttribute('data-header-hidden', '');
+			else document.documentElement.removeAttribute('data-header-hidden');
 			last = y;
 		};
 		addEventListener('scroll', onScroll, { passive: true });
@@ -41,6 +48,12 @@ export function Header() {
 		top.current && ro.observe(top.current);
 		return () => ro.disconnect();
 	}, []);
+
+	// keep the html attribute (TOC/ruler extension) in sync with whatever sets the state
+	useEffect(() => {
+		if (hidden) document.documentElement.setAttribute('data-header-hidden', '');
+		else document.documentElement.removeAttribute('data-header-hidden');
+	}, [hidden]);
 
 	useEffect(() => setOpen(false), [url]);
 	useEffect(() => {

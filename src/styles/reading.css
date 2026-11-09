@@ -219,9 +219,22 @@
 		line-height: 1.4;
 	}
 
+	.toc a.mid {
+		padding-left: 14px;
+	}
+
 	.toc a.sub {
-		padding-left: 24px;
+		padding-left: 26px;
 		font-size: 0.75rem;
+	}
+
+	/* when the header slides away, the toc and ruler extend into its space */
+	:root[data-header-hidden] .toc {
+		top: 16px;
+	}
+
+	:root[data-header-hidden] .ruler {
+		top: 24px;
 	}
 
 	.toc a:hover {
@@ -286,9 +299,14 @@
 		background: var(--minor-done);
 	}
 
-	.ruler-minor:hover,
-	.ruler-minor.current {
+	.ruler-minor:hover {
 		width: 16px;
+		background: var(--fg);
+	}
+
+	/* the reading position uses the largest tick width */
+	.ruler-minor.current {
+		width: 24px;
 		background: var(--fg);
 	}
 
@@ -318,10 +336,10 @@
 		width: 24px;
 	}
 	.ruler-mark.lv2::before {
-		width: 20px;
+		width: 16px;
 	}
 	.ruler-mark.lv3::before {
-		width: 16px;
+		width: 8px;
 	}
 
 	.ruler-mark::after {
