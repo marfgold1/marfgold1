@@ -276,19 +276,29 @@
 	vertical-align: baseline;
 }
 
-/* code blocks: Shiki runs in CSS-variables mode, mapped to the site tokens */
+/* Code theme, loosely VS Code Dark+/Light+: the same hue families (blue keywords, warm
+   strings, green comments, teal types), adjusted for AA contrast on our --code-bg. */
 .shiki {
 	--shiki-foreground: var(--fg);
 	--shiki-background: var(--code-bg);
-	--shiki-token-keyword: var(--accent);
-	--shiki-token-string: var(--teal);
-	--shiki-token-string-expression: var(--teal);
-	--shiki-token-comment: var(--muted);
-	--shiki-token-constant: var(--amber);
-	--shiki-token-function: var(--fg);
-	--shiki-token-parameter: var(--fg);
+	--shiki-token-keyword: light-dark(#1b47c9, #569cd6);
+	--shiki-token-string: light-dark(#a31515, #ce9178);
+	--shiki-token-string-expression: light-dark(#a31515, #ce9178);
+	--shiki-token-comment: light-dark(#257a25, #6a9955);
+	--shiki-token-constant: light-dark(#0068b3, #4fc1ff);
+	--shiki-token-function: light-dark(#795e26, #dcdcaa);
+	--shiki-token-parameter: light-dark(#001080, #9cdcfe);
 	--shiki-token-punctuation: var(--muted);
-	--shiki-token-link: var(--accent);
+	--shiki-token-link: light-dark(#0068b3, #4fc1ff);
+	--shiki-token-type: light-dark(#1e6d80, #4ec9b0);
+	--shiki-token-tag: light-dark(#1b47c9, #569cd6);
+	--shiki-token-attr-name: light-dark(#1e6d80, #4ec9b0);
+	--shiki-token-attr-value: light-dark(#a31515, #ce9178);
+	--shiki-token-number: light-dark(#056e46, #b5cea8);
+	--shiki-token-operator: light-dark(#333c52, #d4d4d4);
+	--shiki-token-regexp: light-dark(#811f3f, #d16969);
+	--shiki-token-literal: light-dark(#056e46, #b5cea8);
+	--shiki-token-unit: light-dark(#056e46, #b5cea8);
 }
 
 .post-body pre {
