@@ -267,6 +267,15 @@
 	font-feature-settings: 'calt', 'liga';
 }
 
+/* external links: pop-out icon, new tab (components/mdx/A.tsx) */
+.ext-link .ext-icon {
+	margin-left: 2px;
+	margin-bottom: 1px;
+	opacity: 0.6;
+	color: inherit;
+	vertical-align: baseline;
+}
+
 /* code blocks: Shiki runs in CSS-variables mode, mapped to the site tokens */
 .shiki {
 	--shiki-foreground: var(--fg);
