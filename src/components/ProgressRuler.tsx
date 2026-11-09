@@ -35,7 +35,7 @@ export function ProgressRuler() {
 	let lastShown = -Infinity;
 	const marks = headings.map((h, i) => {
 		const y = row(ks[i]);
-		const show = h.level === 2 && y - lastShown >= LABEL_GAP;
+		const show = y - lastShown >= LABEL_GAP;
 		if (show) lastShown = y;
 		return { h, y, show, k: ks[i] };
 	});

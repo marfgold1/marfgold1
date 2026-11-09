@@ -58,27 +58,28 @@ Harus diketahui terlebih dahulu bahwa dalam WebGL:
 
 ### 1. Penulisan matriks transformasi.
 
-> Matriks transformasi **dibaca dari kanan ke kiri**, namun **perkaliannya dihitung dari kiri ke kanan (asumsi matriks dalam row-major ordering, lihat di bawah)**. Misalkan kita punya matriks translasi T, matriks rotasi R, dan matriks scaling S, jika kita ingin rotasi, baru scaling dan terakhir translasi, maka perkaliannya adalah T\*S\*R. Ini juga dijelaskan pada saat kuliah. Silahkan lihat penjelasan di bawah untuk detail lebih lanjut.
+Matriks transformasi **dibaca dari kanan ke kiri**, namun **perkaliannya dihitung dari kiri ke kanan (asumsi matriks dalam row-major ordering, lihat di bawah)**. Misalkan kita punya matriks translasi T, matriks rotasi R, dan matriks scaling S, jika kita ingin rotasi, baru scaling dan terakhir translasi, maka perkaliannya adalah T\*S\*R. Ini juga dijelaskan pada saat kuliah. Silahkan lihat penjelasan di bawah untuk detail lebih lanjut.
 
 ### 2. Aturan matriks dalam Matematika vs WebGL
 
-> WebGL selalu mengasumsikan matriks yang diberikan dalam ***column-major ordering*** seperti transformasi translasi berikut:
->
-> ![](/img/grafkom/image160.png)
->
-> Akan tetapi, dalam matematika dan teori grafika, biasanya kita akan menggunakan matriks dalam *row-major ordering* seperti transformasi translasi berikut:
->
-> ![](/img/grafkom/image148.png)
->
-> Jadi, perlu diingat, ketika melakukan komposisi transformasi, misalnya transformasi TRS (ingat, bacanya scale dulu, baru rotasi, dan terakhir translasi) dimana matriks T,R,S dalam bentuk *row-major ordering*, yang diminta WebGL adalah $(TRS)^{T}$ sehingga **hasil perkaliannya** harus ditranspose di akhir. Akan tetapi, jika kita memiliki matriks T, R, dan S dalam bentuk *column-major ordering* (yakni $T^{T}$, $R^{T}$, dan $S^{T}$), maka kita harus melakukan perkalian dengan $S^{T}*R^{T}*T^{T}$, **kebalikan** dari *row-major ordering*. Secara matematis, hal ini bisa dituliskan sebagai:
->
-> $$
-> (TRS)^{T} = (T*R*S)^{T} = S^{T}*R^{T}*T^{T}
-> $$
->
-> Dimana T, R, S merupakan matriks transformasi dalam bentuk *row-major ordering*. Supaya tidak membingungkan penulisan perkalian matriks yang sudah dalam *column-major*, selain fungsi `mul` yang mengalikan matriks dari kiri ke kanan, biasa dibutuhkan fungsi `premul` yang mengalikan matriks secara terbalik (dari kanan ke kiri), sehingga $premul\left( T^{T},R^{T},S^{T} \right) = mul(T,R,S)^{T} = mul\left( S^{T},R^{T},T^{T} \right) = premul(S,R,T)^{T}$.
->
-> Ada beberapa approach untuk menangani hal ini:
+WebGL selalu mengasumsikan matriks yang diberikan dalam ***column-major ordering*** seperti transformasi translasi berikut:
+
+![](/img/grafkom/image160.png)
+
+Akan tetapi, dalam matematika dan teori grafika, biasanya kita akan menggunakan matriks dalam *row-major ordering* seperti transformasi translasi berikut:
+
+![](/img/grafkom/image148.png)
+
+Jadi, perlu diingat, ketika melakukan komposisi transformasi, misalnya transformasi TRS (ingat, bacanya scale dulu, baru rotasi, dan terakhir translasi) dimana matriks T,R,S dalam bentuk *row-major ordering*, yang diminta WebGL adalah $(TRS)^{T}$ sehingga **hasil perkaliannya** harus ditranspose di akhir. Akan tetapi, jika kita memiliki matriks T, R, dan S dalam bentuk *column-major ordering* (yakni $T^{T}$, $R^{T}$, dan $S^{T}$), maka kita harus melakukan perkalian dengan $S^{T}*R^{T}*T^{T}$, **kebalikan** dari *row-major ordering*. Secara matematis, hal ini bisa dituliskan sebagai:
+
+
+$$
+(TRS)^{T} = (T*R*S)^{T} = S^{T}*R^{T}*T^{T}
+$$
+
+Dimana T, R, S merupakan matriks transformasi dalam bentuk *row-major ordering*. Supaya tidak membingungkan penulisan perkalian matriks yang sudah dalam *column-major*, selain fungsi `mul` yang mengalikan matriks dari kiri ke kanan, biasa dibutuhkan fungsi `premul` yang mengalikan matriks secara terbalik (dari kanan ke kiri), sehingga $premul\left( T^{T},R^{T},S^{T} \right) = mul(T,R,S)^{T} = mul\left( S^{T},R^{T},T^{T} \right) = premul(S,R,T)^{T}$.
+
+Ada beberapa approach untuk menangani hal ini:
 
 - [*Matrix4 three.js*](https://threejs.org/docs/#api/en/math/Matrix4): matriks menerima penulisan data dalam row-major ordering, namun secara internal menyimpan elemen dalam column-major ordering (secara otomatis transpose input data). Komposisi matriks dilakukan dengan mengalikan matriks-matriks dalam column-major ordering secara terbalik/premul (karena matriks secara internal sudah dalam column-major, sehingga perkalian perlu dilakukan dari paling kanan hingga kiri)
 
@@ -88,25 +89,25 @@ Harus diketahui terlebih dahulu bahwa dalam WebGL:
 
 - Untuk uniform, bisa menggunakan `transpose = true` ketika akan memanggil `uniformMatrixXfv`. Cara ini tidak bisa untuk atribut (harus transpose manual sebelum `gl.bufferData` ke GPU).
 
-> **Pada guidebook ini, mathematically speaking, matriks akan selalu dituliskan row-major ordering**, namun perkalian matriks seperti A\*B tidak akan mengasumsikan ordering A dan B, namun perkalian akan menggunakan fungsi yang berbeda tergantung ordering dari matriks A dan B: `mul(A,B)` jika A dan B matriks row-major ordering atau `premul(A,B)` jika A dan B matriks column-major ordering. Akan tetapi, **dalam bentuk kode**, implementation reference akan menggunakan cara seperti m4.js pada WebGL Fundamentals, dimana matriks selalu dalam column-major dan perkalian menggunakan `premul`. Silahkan sesuaikan dengan implementasi library yang cocok bagi peserta, yang penting jangan lupa kalau **WebGL SELALU mengasumsikan matrix dalam column-major ordering**, sehingga **perkalian matriks pada GLSL dilakukan dari kanan ke kiri / premul**.
+**Pada guidebook ini, mathematically speaking, matriks akan selalu dituliskan row-major ordering**, namun perkalian matriks seperti A\*B tidak akan mengasumsikan ordering A dan B, namun perkalian akan menggunakan fungsi yang berbeda tergantung ordering dari matriks A dan B: `mul(A,B)` jika A dan B matriks row-major ordering atau `premul(A,B)` jika A dan B matriks column-major ordering. Akan tetapi, **dalam bentuk kode**, implementation reference akan menggunakan cara seperti m4.js pada WebGL Fundamentals, dimana matriks selalu dalam column-major dan perkalian menggunakan `premul`. Silahkan sesuaikan dengan implementasi library yang cocok bagi peserta, yang penting jangan lupa kalau **WebGL SELALU mengasumsikan matrix dalam column-major ordering**, sehingga **perkalian matriks pada GLSL dilakukan dari kanan ke kiri / premul**.
 
 ### 3. Sistem koordinat clip space di WebGL.
 
-> ![](/img/grafkom/image152.png)
->
-> Semua objek dalam WebGL pada akhirnya diletakkan dalam *clip space*, yaitu `gl_Position` sebagai “return value” dari *vertex shader*. Koordinat ini disebut sebagai *clip coordinates* atau juga dikenal sebagai *normalized device coordinates* (NDC). Akan tetapi, beberapa 3D *engine* memiliki koordinat yang berbeda, biasanya sumbu Z dan Y ditukar seperti di Blender dan Unreal Engine. Jika kamu ingin menggunakan koordinat yang berbeda untuk 3D *engine* kamu juga tidak masalah, selama koordinat semua *vertices* pada akhirnya ditransformasikan ke dalam *clip space*.
+![](/img/grafkom/image152.png)
+
+Semua objek dalam WebGL pada akhirnya diletakkan dalam *clip space*, yaitu `gl_Position` sebagai “return value” dari *vertex shader*. Koordinat ini disebut sebagai *clip coordinates* atau juga dikenal sebagai *normalized device coordinates* (NDC). Akan tetapi, beberapa 3D *engine* memiliki koordinat yang berbeda, biasanya sumbu Z dan Y ditukar seperti di Blender dan Unreal Engine. Jika kamu ingin menggunakan koordinat yang berbeda untuk 3D *engine* kamu juga tidak masalah, selama koordinat semua *vertices* pada akhirnya ditransformasikan ke dalam *clip space*.
 
 ### 4. Orientasi koordinat tekstur dalam WebGL
 
-> Dalam WebGL, koordinat tekstur dimulai dari 0.0 hingga 1.0 untuk kiri ke kanan dan 0.0 hingga 1.0 untuk piksel pertama pada baris pertama ke piksel terakhir pada baris terakhir (tidak ada orientasi spesifik). Data tekstur pada koordinat tekstur dimulai dari (0.0, 0.0) dan berakhir pada (1.0, 1.0)
->
-> ![](/img/grafkom/image161.png)
->
-> Terkadang, penggambaran tekstur yang salah mengakibatkan gambar yang terbalik, seperti berikut:
->
-> ![](/img/grafkom/image155.png)
->
-> Gambar tersebut terbalik karena WebGL expect membaca piksel dari bottom-left (bawah-kiri) ke top-right (atas-kanan), sedangkan image yang kita supply dibaca oleh browser dari top-left (atas-kiri) ke bottom-right (bawah-kanan). Lalu, bagaimana cara kita menggambarkan teksturnya dengan benar? Ada beberapa cara, **pilih salah satu**:
+Dalam WebGL, koordinat tekstur dimulai dari 0.0 hingga 1.0 untuk kiri ke kanan dan 0.0 hingga 1.0 untuk piksel pertama pada baris pertama ke piksel terakhir pada baris terakhir (tidak ada orientasi spesifik). Data tekstur pada koordinat tekstur dimulai dari (0.0, 0.0) dan berakhir pada (1.0, 1.0)
+
+![](/img/grafkom/image161.png)
+
+Terkadang, penggambaran tekstur yang salah mengakibatkan gambar yang terbalik, seperti berikut:
+
+![](/img/grafkom/image155.png)
+
+Gambar tersebut terbalik karena WebGL expect membaca piksel dari bottom-left (bawah-kiri) ke top-right (atas-kanan), sedangkan image yang kita supply dibaca oleh browser dari top-left (atas-kiri) ke bottom-right (bawah-kanan). Lalu, bagaimana cara kita menggambarkan teksturnya dengan benar? Ada beberapa cara, **pilih salah satu**:
 
 - Menuliskan koordinat tekstur dimulai dengan (0,0) dari atas - kiri dan berakhir dengan (1,1) pada bawah - kanan.
 
@@ -127,7 +128,7 @@ Harus diketahui terlebih dahulu bahwa dalam WebGL:
 
 - Kita juga bisa flip vertikal gambar secara manual dengan program manipulasi gambar, jadi gambar yang akan di-load memang sudah terbalik.
 
-> Silahkan pilih **salah satu** metode yang menurut kalian lebih baik dan feasible. Kalian harus konsisten dalam menentukan cara penggambaran yang benar, misalnya jika kamu memakai fitur `UNPACK_FLIP_Y_WEBGL` (cara ketiga) tapi menggambar koordinat tekstur dimulai dari atas-kiri (cara pertama), maka gambarnya akan tetap kebalik 🙂. **Pastikan aware terhadap masalah orientasi ini. Guidebook ini akan secara konsisten menggunakan cara pertama, yaitu mengasumsikan penulisan texcoord dari atas-kiri, kecuali jika disampaikan secara eksplisit.**
+Silahkan pilih **salah satu** metode yang menurut kalian lebih baik dan feasible. Kalian harus konsisten dalam menentukan cara penggambaran yang benar, misalnya jika kamu memakai fitur `UNPACK_FLIP_Y_WEBGL` (cara ketiga) tapi menggambar koordinat tekstur dimulai dari atas-kiri (cara pertama), maka gambarnya akan tetap kebalik 🙂. **Pastikan aware terhadap masalah orientasi ini. Guidebook ini akan secara konsisten menggunakan cara pertama, yaitu mengasumsikan penulisan texcoord dari atas-kiri, kecuali jika disampaikan secara eksplisit.**
 
 ## ● Format File dalam Grafika Komputer
 

@@ -32,6 +32,18 @@
 	--heading: light-dark(#1d9b80, #26ceaa);
 	--purple: light-dark(#3d1a78, #c9b3ff);
 
+	/* code theme (VS-like roles, our palette): keyword=indigo, string=teal, number=amber,
+	   type=blue, function=purple; all pass AA on --code-bg */
+	--code-keyword: light-dark(#5049cc, #a9b1ff);
+	--code-string: light-dark(#066f59, #4fe0bd);
+	--code-comment: light-dark(#4c6270, #a49fc6);
+	--code-number: light-dark(#9a4f06, #f2b35e);
+	--code-type: light-dark(#2a63ad, #7bade2);
+	--code-function: light-dark(#3d1a78, #c9b3ff);
+	--code-constant: light-dark(#2a63ad, #8db4ff);
+	--code-operator: light-dark(#333c52, #c8cfe4);
+	--code-regexp: light-dark(#9a4f06, #f2b35e);
+
 	--code-bg: light-dark(#e8f1f5, #17122b);
 	--mark: light-dark(#fdeea8, #5b4a12);
 	--shadow: light-dark(0 6px 22px #14212b14, 0 6px 22px #0006);

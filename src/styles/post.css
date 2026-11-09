@@ -191,10 +191,9 @@
 	margin: 1.5rem 0;
 	padding: 0.25rem 0 0.25rem 1.4rem;
 	border-left: 4px solid var(--accent);
-	font-family: var(--font-display);
 	font-style: italic;
-	font-weight: 500;
-	font-size: 1.3rem;
+	font-weight: 400;
+	font-size: 1.0625rem;
 	line-height: 1.5;
 	letter-spacing: -0.01em;
 }
@@ -281,24 +280,24 @@
 .shiki {
 	--shiki-foreground: var(--fg);
 	--shiki-background: var(--code-bg);
-	--shiki-token-keyword: light-dark(#1b47c9, #569cd6);
-	--shiki-token-string: light-dark(#a31515, #ce9178);
-	--shiki-token-string-expression: light-dark(#a31515, #ce9178);
-	--shiki-token-comment: light-dark(#257a25, #6a9955);
-	--shiki-token-constant: light-dark(#0068b3, #4fc1ff);
-	--shiki-token-function: light-dark(#795e26, #dcdcaa);
-	--shiki-token-parameter: light-dark(#001080, #9cdcfe);
-	--shiki-token-punctuation: var(--muted);
-	--shiki-token-link: light-dark(#0068b3, #4fc1ff);
-	--shiki-token-type: light-dark(#1e6d80, #4ec9b0);
-	--shiki-token-tag: light-dark(#1b47c9, #569cd6);
-	--shiki-token-attr-name: light-dark(#1e6d80, #4ec9b0);
-	--shiki-token-attr-value: light-dark(#a31515, #ce9178);
-	--shiki-token-number: light-dark(#056e46, #b5cea8);
-	--shiki-token-operator: light-dark(#333c52, #d4d4d4);
-	--shiki-token-regexp: light-dark(#811f3f, #d16969);
-	--shiki-token-literal: light-dark(#056e46, #b5cea8);
-	--shiki-token-unit: light-dark(#056e46, #b5cea8);
+	--shiki-token-keyword: var(--code-keyword);
+	--shiki-token-string: var(--code-string);
+	--shiki-token-string-expression: var(--code-string);
+	--shiki-token-comment: var(--code-comment);
+	--shiki-token-constant: var(--code-constant);
+	--shiki-token-function: var(--code-function);
+	--shiki-token-parameter: var(--code-type);
+	--shiki-token-punctuation: var(--code-comment);
+	--shiki-token-link: var(--code-constant);
+	--shiki-token-type: var(--code-type);
+	--shiki-token-tag: var(--code-keyword);
+	--shiki-token-attr-name: var(--code-type);
+	--shiki-token-attr-value: var(--code-string);
+	--shiki-token-number: var(--code-number);
+	--shiki-token-operator: var(--code-operator);
+	--shiki-token-regexp: var(--code-regexp);
+	--shiki-token-literal: var(--code-number);
+	--shiki-token-unit: var(--code-number);
 }
 
 .post-body pre {
@@ -401,13 +400,13 @@
 }
 
 /* headings are links to themselves (rehype-autolink-headings, "wrap") */
-.post-body :is(h2, h3, h4, h5, h6) > a {
+.post-body :is(h1, h2, h3, h4, h5, h6) > a {
 	color: inherit;
 	text-decoration: none;
 	cursor: pointer;
 }
 
-.post-body :is(h2, h3, h4, h5, h6) > a:hover {
+.post-body :is(h1, h2, h3, h4, h5, h6) > a:hover {
 	text-decoration: underline;
 	text-decoration-color: var(--link);
 	text-decoration-thickness: 3px;
