@@ -198,10 +198,10 @@
  * past; the tick at the reading position and the hovered tick expand and turn dark. */
 @media (min-width: 1280px) {
 	.ruler {
-		--minor: color-mix(in srgb, var(--muted) 30%, transparent);
-		--minor-done: color-mix(in srgb, var(--muted) 15%, transparent);
-		--tick: color-mix(in srgb, var(--muted) 62%, transparent);
-		--tick-done: color-mix(in srgb, var(--muted) 28%, transparent);
+		--minor: color-mix(in srgb, var(--muted) 50%, transparent);
+		--minor-done: color-mix(in srgb, var(--muted) 10%, transparent);
+		--tick: color-mix(in srgb, var(--muted) 100%, transparent);
+		--tick-done: color-mix(in srgb, var(--muted) 30%, transparent);
 
 		display: block;
 		position: fixed;
@@ -245,7 +245,7 @@
 
 	.ruler-minor:hover,
 	.ruler-minor.current {
-		width: 22px;
+		width: 16px;
 		background: var(--fg);
 	}
 
