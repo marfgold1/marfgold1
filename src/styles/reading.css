@@ -1,7 +1,8 @@
 /*
- * Reading progress UI. Both pieces share one scroll store (src/lib/reading.ts):
- *   - phones (<= 860px):  header slides away on scroll down; the reading bar stays pinned
- *   - large (>= 1280px):  ruler on the right edge with a title for every section
+ * Reading progress UI. All pieces share one scroll store (src/lib/reading.ts):
+ *   - everywhere:      the header is fixed and slides away on scroll down
+ *   - <= 1279px:       reading bar pinned under it (current section, tap for the list)
+ *   - >= 1280px:       table of contents fixed at the left, ruler at the right edge
  * The article itself is always a single centred column.
  */
 
@@ -10,40 +11,43 @@
 	margin-inline: auto;
 }
 
+.toc,
+.toc,
 .ruler,
 .reading-bar {
 	display: none;
 }
 
-/* ---- phones ---- */
-@media (max-width: 860px) {
-	.site-header {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 50;
-		background: color-mix(in srgb, var(--bg) 94%, transparent);
-		-webkit-backdrop-filter: blur(12px);
-		backdrop-filter: blur(12px);
-		border-bottom: 1px solid var(--border);
-		transition: transform 0.25s ease;
-	}
+/* ---- header: fixed and slides away on scroll down, everywhere ---- */
+.site-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 50;
+	background: color-mix(in srgb, var(--bg) 94%, transparent);
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+	border-bottom: 1px solid var(--border);
+	transition: transform 0.25s ease;
+}
 
-	/* reserve the space the fixed header takes (measured in Header.tsx) */
-	#app {
-		padding-top: var(--header-h, 0px);
-	}
+/* reserve the space the fixed header takes (measured in Header.tsx) */
+#app {
+	padding-top: var(--header-h, 0px);
+}
 
-	/* no reading bar: the whole header leaves; with one, only the top part does */
-	.site-header[data-hidden] {
-		transform: translateY(-100%);
-	}
+/* no reading bar: the whole header leaves; with one, only the top part does */
+.site-header[data-hidden] {
+	transform: translateY(-100%);
+}
 
-	.site-header[data-hidden][data-reading] {
-		transform: translateY(calc(-1 * var(--top-h, 0px)));
-	}
+.site-header[data-hidden][data-reading] {
+	transform: translateY(calc(-1 * var(--top-h, 0px)));
+}
 
+/* ---- reading bar: phones and tablets ---- */
+@media (max-width: 1279px) {
 	.reading-bar {
 		display: block;
 		position: relative;
@@ -184,10 +188,50 @@
 	}
 }
 
-@media (prefers-reduced-motion: reduce) {
-	.site-header,
-	.reading-chev {
-		transition: none;
+/* ---- desktop: table of contents, fixed at the left edge ---- */
+@media (min-width: 1280px) {
+	.toc {
+		display: block;
+		position: fixed;
+		z-index: 40;
+		left: 16px;
+		top: 96px;
+		bottom: 32px;
+		width: 230px;
+		overflow-y: auto;
+		font-size: 0.8125rem;
+	}
+
+	.toc-title {
+		margin: 0 0 0.6rem;
+		font: 700 0.7rem var(--font-mono);
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+
+	.toc a {
+		display: block;
+		padding: 3px 0 3px 12px;
+		border-left: 2px solid var(--border);
+		color: var(--muted);
+		text-decoration: none;
+		line-height: 1.4;
+	}
+
+	.toc a.sub {
+		padding-left: 24px;
+		font-size: 0.75rem;
+	}
+
+	.toc a:hover {
+		color: var(--fg);
+	}
+
+	.toc a.on {
+		color: var(--accent);
+		border-left-color: var(--accent);
+		font-weight: 600;
 	}
 }
 

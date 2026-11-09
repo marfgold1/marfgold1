@@ -64,11 +64,13 @@ Matriks transformasi **dibaca dari kanan ke kiri**, namun **perkaliannya dihitun
 
 WebGL selalu mengasumsikan matriks yang diberikan dalam ***column-major ordering*** seperti transformasi translasi berikut:
 
-![](/img/grafkom/image160.png)
+
+$$\begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 10 & 20 & 30 & 1 \end{pmatrix}$$
 
 Akan tetapi, dalam matematika dan teori grafika, biasanya kita akan menggunakan matriks dalam *row-major ordering* seperti transformasi translasi berikut:
 
-![](/img/grafkom/image148.png)
+
+$$\begin{pmatrix} 1 & 0 & 0 & 10 \\ 0 & 1 & 0 & 20 \\ 0 & 0 & 1 & 30 \\ 0 & 0 & 0 & 1 \end{pmatrix}$$
 
 Jadi, perlu diingat, ketika melakukan komposisi transformasi, misalnya transformasi TRS (ingat, bacanya scale dulu, baru rotasi, dan terakhir translasi) dimana matriks T,R,S dalam bentuk *row-major ordering*, yang diminta WebGL adalah $(TRS)^{T}$ sehingga **hasil perkaliannya** harus ditranspose di akhir. Akan tetapi, jika kita memiliki matriks T, R, dan S dalam bentuk *column-major ordering* (yakni $T^{T}$, $R^{T}$, dan $S^{T}$), maka kita harus melakukan perkalian dengan $S^{T}*R^{T}*T^{T}$, **kebalikan** dari *row-major ordering*. Secara matematis, hal ini bisa dituliskan sebagai:
 
@@ -179,7 +181,8 @@ Transformasi *local* memiliki dua representasi yang berbeda pada glTF. Pertama, 
 }
 ```
 
-![](/img/grafkom/image154.png)
+
+$$M = \begin{pmatrix} 2.0 & 0.0 & 0.0 & 10.0 \\ 0.0 & 0.866 & -0.25 & 20.0 \\ 0.0 & 0.5 & 0.433 & 30.0 \\ 0.0 & 0.0 & 0.0 & 1.0 \end{pmatrix}$$
 
 Kedua, bisa juga dengan memberikan transformasi dalam properti (T)ranslation (translasi), (R)otation (rotasi), dan (S)cale (scaling) yang disebut juga sebagai TRS. Berikut adalah transformasi yang sama dengan representasi matriks sebelumnya, namun dalam bentuk properti TRS (rotasi dalam quaternion (x,y,z,w))
 
@@ -193,17 +196,17 @@ Kedua, bisa juga dengan memberikan transformasi dalam properti (T)ranslation (tr
 
 Lalu bagaimana cara mendapatkan matriks tersebut dari translasi, rotasi, dan scale? Tentu saja, hasil perkalian dari representasi matriks setiap transformasi tersebut. Dalam kelas grafika komputer, kita belajar bahwa transformasi biasa dilakukan dalam sebuah *reference system* berupa koordinat homogen (*homogeneous coordinates*). Setiap transformasi affine dapat direpresentasikan dalam sebuah matriks 4x4 pada koordinat homogen sebagai berikut:
 
-> ![](/img/grafkom/image168.png)
+> $$\mathbf{A} = \begin{bmatrix} \alpha_{11} & \alpha_{12} & \alpha_{13} & \alpha_{14} \\ \alpha_{21} & \alpha_{22} & \alpha_{23} & \alpha_{24} \\ \alpha_{31} & \alpha_{32} & \alpha_{33} & \alpha_{34} \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
 
 Mari kita lihat detail ketiga transformasi tersebut:
 
 1.  Translation: hanya menampilkan translasi pada sumbu x, y, dan z. Secara umum, kita tahu bahwa translasi sejauh $t_x$, $t_y$, dan $t_z$ akan menghasilkan titik baru x’, y’, dan z’ pada titik awal x, y, dan z, terurut sebagai berikut:
 
-    ![](/img/grafkom/image158.png)
+    $$x' = x + t_x, \quad y' = y + t_y, \quad z' = z + t_z$$
 
-    Dalam koordinat homogen di ruang *affine*, kita bisa merepresentasikan **titik** dengan komponen terakhir 1 yaitu ![](/img/grafkom/image159.png)atau **vektor** dengan komponen terakhir 0 yaitu ![](/img/grafkom/image157.png). Karena kasus ini kita membahas titik, maka transformasi tersebut dapat direpresentasikan dalam persamaan matriks berikut:
+    Dalam koordinat homogen di ruang *affine*, kita bisa merepresentasikan **titik** dengan komponen terakhir 1 yaitu $[x \; y \; z \; 1]^T$atau **vektor** dengan komponen terakhir 0 yaitu $[x \; y \; z \; 0]^T$. Karena kasus ini kita membahas titik, maka transformasi tersebut dapat direpresentasikan dalam persamaan matriks berikut:
 
-    ![](/img/grafkom/image163.png)
+    $$\begin{bmatrix} x' \\ y' \\ z' \\ 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & t_x \\ 0 & 1 & 0 & t_y \\ 0 & 0 & 1 & t_z \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ z \\ 1 \end{bmatrix}$$
 
     Matriks kedua tersebut dapat disebut sebagai *translation matrix* yang merepresentasikan perpindahan titik sejauh $t_x$, $t_y$, dan $t_z$ pada sumbu x, y, dan z.
 
@@ -211,7 +214,7 @@ Mari kita lihat detail ketiga transformasi tersebut:
 
     Mari kita bahas terlebih dahulu rotasi dalam *euler angles*. Rotasi 3D pada sumbu-z dapat diturunkan dari rotasi 2D (yang dimana berada pada plane xy dengan z konstan sehingga menghasilkan rotasi sumbu z), sehingga persamaannya adalah sebagai berikut:
 
-    ![](/img/grafkom/image166.png)
+    $$x' = x\cos\theta - y\sin\theta, \quad y' = x\sin\theta + y\cos\theta, \quad z' = z,$$
 
     Atau dalam persamaan matriks di koordinat homogen, sebuah titik p yang dirotasi terhadap sumbu-z sebesar *θ* menghasilkan titik p’ sebagai berikut:
 
@@ -219,13 +222,13 @@ Mari kita lihat detail ketiga transformasi tersebut:
 
     Kita juga bisa menurunkan matriks untuk rotasi dari sumbu x dan z dengan cara yang sama: rotasi sumbu-x akan membuat nilai x tidak berubah sehingga kita punya rotasi 2 dimensi dimana titik tersebut ber-rotasi pada bidang konstan di x. Rotasi sumbu-y juga sama, hanya nilai y saja yang tidak berubah.
 
-    ![](/img/grafkom/image162.png)
+    $$\mathbf{R}_x = \mathbf{R}_x(\theta) = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & \cos\theta & -\sin\theta & 0 \\ 0 & \sin\theta & \cos\theta & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}, \quad \mathbf{R}_y = \mathbf{R}_y(\theta) = \begin{bmatrix} \cos\theta & 0 & \sin\theta & 0 \\ 0 & 1 & 0 & 0 \\ -\sin\theta & 0 & \cos\theta & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
 
     Tanda dari fungsi sinus tersebut konsisten dengan definisi rotasi positif dalam kaidah tangan kanan (positif menandakan perputaran yang searah dengan kaidah tangan kanan).
 
     Lalu, kita bisa menggabungkan rotasi dalam ketiga sumbu untuk membentuk sebuah rotasi secara umum dalam tiga dimensi. Salah satu konvensi adalah X-Y-Z, yakni rotasi pada arah sumbu-X terlebih dahulu, lalu rotasi pada arah sumbu-Y, dan terakhir rotasi pada arah sumbu-Z, sehingga formulanya adalah sebagai berikut:
 
-    ![](/img/grafkom/image164.png)
+    $\mathbf{R} = \mathbf{R}_z\mathbf{R}_y\mathbf{R}_x$
 
     Matriks akhir untuk rotasi X-Y-Z adalah sebagai berikut, dengan x = sudut rotasi sumbu X, y = sudut rotasi sumbu Y, dan z = sudut rotasi sumbu Z (x, y, dan z dalam radian).
 
@@ -235,17 +238,17 @@ Mari kita lihat detail ketiga transformasi tersebut:
 
     Sebenarnya, banyak sekali transformasi rotasi yang dapat dilakukan, terutama ketika memiliki sumbu putaran selain dari basis dalam tiga dimensi (sumbu x, y, dan z). Hal tersebut bisa saja dengan melakukan komposisi transformasi, namun hal itu juga dapat kita turunkan dengan bantuan *quaternion*. Pada umumnya, untuk menghandle semua kasus rotasi, kita bisa melakukannya dengan representasi rotasi dalam *quaternion*, lalu konversi nilainya menjadi *euler angles*, baru kita masukkan dalam transformasi matriks rotasi sebelumnya. Akan tetapi, kita bisa saja langsung memakai *quaternion* untuk membuat matriks rotasi. Terdapat beberapa *use case* yang lebih baik menggunakan transformasi rotasi dari quaternion secara langsung, salah satunya yaitu untuk menghindari *gimbal lock* dan *tweening* antar rotasi. Matriks rotasi jika menggunakan *unit quaternion*…
 
-    ![](/img/grafkom/image169.png)
+    $q = q_w + iq_x + jq_y + kq_z$
 
     …pada koordinat homogen adalah sebagai berikut:
 
-    ![](/img/grafkom/image167.png)
+    $$\begin{bmatrix} q_w^2 + q_x^2 - q_y^2 - q_z^2 & 2(q_xq_y - q_wq_z) & 2(q_wq_y + q_xq_z) & 0 \\ 2(q_xq_y + q_wq_z) & q_w^2 - q_x^2 + q_y^2 - q_z^2 & 2(q_yq_z - q_wq_x) & 0 \\ 2(q_xq_z - q_wq_y) & 2(q_wq_x + q_yq_z) & q_w^2 - q_x^2 - q_y^2 + q_z^2 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
 
     Buku Angel cukup menjelaskan penggunaan *quaternion* untuk rotasi. Selain itu, perlu ada fungsi untuk membantu memanipulasi *quaternion* dalam bentuk yang lebih *friendly*. Silahkan lihat implementation reference untuk mengetahui contoh implementasi. Jika ingin tahu lebih lanjut mengenai *euler angles* dapat dilihat pada artikel [*berikut*](https://starmanta.gitbooks.io/unitytipsredux/content/second-question.html) dan [*Wolfram MathWorld*](https://mathworld.wolfram.com/EulerAngles.html) serta *quaternion* pada video 3blue1brown [*berikut*](https://www.youtube.com/watch?v=d4EgbgTm0Bg) (ada versi interaktifnya juga).
 
 3.  Scaling memperbesar titik pada sumbu x, y, dan z sebesar $s_x$, $s_y$, dan $s_z$ menjadi x’, y’, z’ dengan persamaan berikut:
 
-    ![](/img/grafkom/image132.png)
+    $$x' = xs_x, \quad y' = ys_y, \quad z' = zs_z$$
 
     Dalam koordinat homogen, transformasi scaling dapat direpresentasikan dalam persamaan matriks berikut:
 
@@ -450,7 +453,7 @@ Referensi API: [*Three.js Object3D*](https://threejs.org/docs/#api/en/core/Objec
 
 Pembuatan objek baru dalam JavaScript (dan bahasa pemrograman lainnya) cukup lambat. Konsep *object pooling* merupakan salah satu cara untuk mengatasi hal tersebut (alih-alih *destroy* *instance* dari objek, objek tersebut di-”*hide”* dan di-*recycle* ketika dipakai untuk hal lain). Dalam pembuatan library math, kita seringkali membutuhkan sebuah objek vektor atau matriks (berisi matriks identitas) baru sebagai **perantara** (jangan memakai *instanced variable* untuk mengembalikan nilai baru) dari suatu perhitungan. Misalnya, untuk `lookAt(eye, target, up)` sendiri membutuhkan 3 vektor (*f*)orward, (*l*)eft, dan (*u*)p dalam perhitungannya sebagai berikut (*f*, *l*, dan *u* dinormalisasi setelah perhitungan, lihat referensi lain [*berikut*](https://medium.com/@carmencincotti/lets-look-at-magic-lookat-matrices-c77e53ebdf78)):
 
-![](/img/grafkom/image16.png) ![](/img/grafkom/image12.png)
+$$\begin{aligned} f &= eye - target \\ l &= up \times f \\ u &= f \times l \\ R &= \begin{bmatrix} l.x & l.y & l.z & 0 \\ u.x & u.y & u.z & 0 \\ f.x & f.y & f.z & 0 \\ eye.x & eye.y & eye.z & 1 \end{bmatrix} \end{aligned}$$ ![](/img/grafkom/image12.png)
 
 Kita bisa saja membuat objek vektor baru dengan `new Vector3()` terus menerus untuk menyimpan *f*, *l*, dan *u*. Akan tetapi, `lookAt` merupakan fungsi yang sering sekali dipanggil setiap frame update, mengakibatkan garbage collector (gweh 🤓☝️) harus terus menerus destroy *f*, *l*, dan *u* yang dibuat. Bagaimana jika ada ribuan, hingga ratusan objek memanggil `lookAt`? Ratusan ribu variabel dibuat dan langsung di-destroy setiap framenya. Sangat wasteful bukan? Oleh karena itu, biasanya library membuat variabel secara global terlebih dahulu, lalu menggunakan variabel tersebut ketika dibutuhkan variabel lokal temporer untuk menyimpan nilai perantara perhitungan (misalnya untuk vektor, biasanya ada method `set(x,y,z)` atau `set(vector)` yang dapat mengatur nilai vektor pada instance vektor tersebut tanpa membuat instance vektor yang baru / *shallow copy*. Biasanya juga ada method `clone()` untuk *deep copy*). Akibatnya, objek tidak perlu dibuat dan dibuang terus menerus, cukup alokasi 3 vektor saja selama lifetime aplikasi, dan garbage collector (gwej banh 🤓☝️) tidak perlu bekerja keras untuk membuang sampah lokal variabel tersebut. Meski begitu, cara ini membuat library menjadi tidak *thread-safe* (bejirrrr gweh bangetz 😎), karena concurrent call `lookAt` akan mungkin membuat variabel global tersebut diakses secara bersamaan.
 
@@ -542,7 +545,8 @@ AnimationClip merupakan tipe untuk animasi yang memiliki nama clip serta frames 
 
 Untuk menjalankan animasi, tentunya kita perlu akses terhadap delta-time antar render. Apa itu delta time? Delta time adalah waktu yang dibutuhkan untuk melakukan render frame selanjutnya. Delta time dapat dihitung dengan timestamp pada frame sekarang $t_{f_c}$ dikurang dengan timestamp pada frame sebelumnya $t_{f_{c - 1}}$ :
 
-![](/img/grafkom/image9.png)
+
+$t_{f_c} - t_{f_{c-1}}$
 
 Jika kalian ingat pada tugas besar sebelumnya, render loop dilakukan dalam fungsi bawaan berikut:
 
@@ -1003,7 +1007,8 @@ $\theta = arccos\left( \frac{z}{r} \right)$
 
 $\varphi = sgn(y)arccos\left( \frac{x}{\sqrt{x^{2} + y^{2}}} \right)$
 
-![](/img/grafkom/image95.png)
+
+$$\operatorname{sgn} x := \begin{cases} -1 & \text{if } x < 0, \\ 0 & \text{if } x = 0, \\ 1 & \text{if } x > 0. \end{cases}$$
 
 Kita punya titik pada permukaan bola, $\vec{p}$, artinya dipastikan jaraknya konstan selalu r, jadi kita cuma perlu tahu $\theta$ dan $\varphi$, Persamaan tersebut masih dalam bentuk $\theta$ dan $\varphi$, dan kita perlu mengubahnya ke dalam koordinat texel (s,t). Karena rentang nilai $\theta$ dan $\varphi$ adalah $0 \leq \theta \leq \pi$ dan $- \pi \leq \varphi \leq \pi$, sedangkan rentang s dan t adalah ($0 \leq s,t \leq 1$), dengan mengubah nilai $\theta$ menjadi s dan $\varphi$ menjadi t, maka kita bisa dapatkan:
 
@@ -1094,7 +1099,8 @@ Sebuah sumber cahaya memang memancarkan jumlah cahaya yang berbeda untuk setiap 
 
 Salah satu sumber cahaya yang paling mudah untuk dimodelkan adalah *distant light* atau *directional light*. Cahaya ini berasal dari sumber dengan posisi yang sangat jauh, sehingga dapat dikatakan paralel dengan semua objek pada *scene*. Salah satu bentuk sumber cahaya ini di dunia nyata adalah matahari (bukan department store). Pada dasarnya, kita mengganti titik sumber cahaya menjadi sebuah sumber yang memancarkan cahaya ke objek dengan sinar cahaya yang sejajar, atau disebut sebagai sumber yang paralel. Bahkan, perhitungan sumber cahaya ini mirip seperti perhitungan pada proyeksi paralel, menggantikan lokasi titik sumber cahaya menjadi arah dari sumber cahaya. Oleh karena itu, sumber cahaya ini dapat dideskripsikan sebagai vektor arah dengan representasi dalam homogeneous coordinates seperti matriks berikut:
 
-![](/img/grafkom/image74.png)
+
+$\mathbf{p}_0 = \begin{bmatrix} x \\ y \\ z \\ 0 \end{bmatrix}$
 
 Pada GLSL, kita bisa memberikan arah sumber cahaya sebagai uniform. Inilah yang akan menjadi nilai *l̂* pada shading model dan berkontribusi pada perhitungan *diffuse* dan *specular*.
 
@@ -1107,7 +1113,8 @@ vec3 L = u_lightDirection;
 
 Dalam sebuah ruangan, biasanya cahayanya telah didesain dan diposisikan sedemikian rupa sehingga memberikan pencahayaan yang sama rata (*uniform*) di sekitar ruangan. Pencahayaan yang *uniform* ini dapat kita sebut sebagai *ambient light*. Hal ini dapat kita modelkan dengan sebuah intensitas $I_{a}$ yang **sama persis** untuk seluruh titik pada objek. Karena kita memiliki tiga komponen warna: merah, hijau, dan biru, maka kita bisa representasikan $\overrightarrow{I_{a}}$ sebagai tiga komponen skalar $I_{a}$ yang terpisah untuk setiap komponen warna sebagai berikut:
 
-![](/img/grafkom/image137.png)
+
+$$\mathbf{I}_{\mathrm{a}} = \begin{bmatrix} I_{\mathrm{ar}} \\ I_{\mathrm{ag}} \\ I_{\mathrm{ab}} \end{bmatrix}$$
 
 Cahaya ini hanya akan mempengaruhi $I_{a}$ dan tidak memiliki kontribusi pada *diffuse* ataupun *specular*.
 
@@ -1117,11 +1124,13 @@ Cahaya ini hanya akan mempengaruhi $I_{a}$ dan tidak memiliki kontribusi pada *d
 
 Sebuah sumber cahaya titik yang ideal memancarkan cahaya sama rata ke seluruh arah. Kita bisa memodelkan sebuah sumber cahaya titik yang berada pada posisi titik $\overrightarrow{p_{0}}$ sebagai matriks dengan tiga komponen warna sebagai berikut:
 
-![](/img/grafkom/image56.png)
+
+$\mathbf{I}(\mathbf{p}_0) = \begin{bmatrix} I_r(\mathbf{p}_0) \\ I_g(\mathbf{p}_0) \\ I_b(\mathbf{p}_0) \end{bmatrix}$
 
 Intensitas cahaya yang diterima dari sebuah sumber cahaya titik akan berbanding terbalik dengan kuadrat dari jarak antara sumber cahaya ke permukaan (populer disebut sebagai [**inverse-square law**](https://en.wikipedia.org/wiki/Inverse-square_law)). Akibatnya, pada titik *p⃗* di permukaan (lihat gambar di atas), intensitas cahaya yang diterima oleh titik tersebut terhadap sumber cahaya titik pada $\overrightarrow{p_{0}}$ didefinisikan dengan matriks berikut:
 
-![](/img/grafkom/image118.png)
+
+$$\mathrm{i}(\mathbf{p},\mathbf{p}_0) = \frac{1}{|\mathbf{p} - \mathbf{p}_0|^2}\,\mathrm{I}(\mathbf{p}_0)$$
 
 Sebuah objek yang dirender dengan sumber cahaya titik doang biasanya akan memiliki kontras yang tinggi dimana objek bisa terlihat sangat terang atau sangat gelap. Dapat dilihat pada gambar di bawah bahwa semua area bisa berada dalam seluruh bayangan (*umbra*) atau berada dalam sebagian bayangan (*penumbra*). Efek kontras tinggi ini dapat kita mitigasi dengan menambahkan *ambient light* pada *scene*.
 
@@ -1204,23 +1213,26 @@ Ada banyak sekali cara kita memodelkan interaksi cahaya dengan material. Salah s
 
 Model Phong mendukung tiga tipe interaksi cahaya-material: *ambient*, *diffuse*, dan *specular*. Setiap sumber cahaya memiliki komponen ambient, diffuse, dan specular yang terpisah untuk setiap ketiga komponen warna utama, sehingga kita butuh 9 koefisien untuk setiap sumber cahaya supaya dapat mendefinisikan hal tersebut. Untuk sumber cahaya ke-*i*, terdapat 3x3 matriks *illumination* ($L_{i}$) yang merupakan nilai-nilai koefisien tersebut sebagai berikut (kiri representasi matriks, kanan representasi dalam GLSL. penggunaan `vec4` berguna untuk memperhitungkan cahaya dengan material yang transparan)
 
-![](/img/grafkom/image131.png) ![](/img/grafkom/image140.png)
+$$\mathbf{L}_i = \begin{bmatrix} L_{\mathrm{ira}} & L_{\mathrm{iga}} & L_{\mathrm{iba}} \\ L_{\mathrm{ird}} & L_{\mathrm{igd}} & L_{\mathrm{ibd}} \\ L_{\mathrm{irs}} & L_{\mathrm{igs}} & L_{\mathrm{ibs}} \end{bmatrix}$$ ![](/img/grafkom/image140.png)
 
 Selain itu, kita juga bisa menghitung seberapa banyak cahaya datang yang akan dipantulkan pada titik di permukaan. Sebagai contoh, untuk diffuse berwarna merah dari sumber i, $L_{ird}$, kita bisa menghitung pantulannya dengan $R_{ird}$, sehingga kontribusi diffuse-merah untuk intensitas cahaya keseluruhan pada titik tersebut adalah $R_{ird}L_{ird}$. Nilai dari $R_{ird}$, tentu saja, bergantung pada properti material, orientasi dari permukaan, arah dari sumber cahaya, dan jarak antara sumber cahaya ke pengamat. Oleh karena itu, setiap titik mempunyai **9 koefisien yang sama dalam satu permukaan (satu material)**, sehingga bisa kita representasikan ke dalam matriks *reflection* sebagai berikut (kiri matriks, kanan glsl):
 
-![](/img/grafkom/image128.png) ![](/img/grafkom/image145.png)
+$$\mathbf{R}_i = \begin{bmatrix} R_{\mathrm{ira}} & R_{\mathrm{iga}} & R_{\mathrm{iba}} \\ R_{\mathrm{ird}} & R_{\mathrm{igd}} & R_{\mathrm{ibd}} \\ R_{\mathrm{irs}} & R_{\mathrm{igs}} & R_{\mathrm{ibs}} \end{bmatrix}$$ ![](/img/grafkom/image145.png)
 
 Dengan demikian, kita bisa menghitung seluruh kontribusi dari setiap sumber dengan menambahkan komponen ambient, diffuse, dan specular. Sebagai contoh, intensitas warna merah pada suatu titik dari sumber cahaya i adalah:
 
-![](/img/grafkom/image129.png)
+
+$$\begin{aligned} I_{\mathrm{ir}} &= R_{\mathrm{ira}}L_{\mathrm{ira}} + R_{\mathrm{ird}}L_{\mathrm{ird}} + R_{\mathrm{irs}}L_{\mathrm{irs}} \\ &= I_{\mathrm{ira}} + I_{\mathrm{ird}} + I_{\mathrm{irs}}. \end{aligned}$$
 
 Total intensitas cahaya warna merah pada titik tersebut merupakan penjumlahan kontribusi warna merah untuk **semua** sumber cahaya, ditambah warna merah pada *global* *ambient* ($I_{ar}$), sehingga:
 
-![](/img/grafkom/image127.png)
+
+$$I_{\mathrm{r}} = \sum_i \left(I_{\mathrm{ira}} + I_{\mathrm{ird}} + I_{\mathrm{irs}}\right) + I_{\mathrm{ar}},$$
 
 Karena kita tahu perhitungan pada dasarnya sama saja untuk setiap sumber cahaya dan setiap komponen warna utama (hanya beda bergantung dari kita mempertimbangkan *ambient*, *diffuse*, atau *specular*), sehingga secara umum intensitas cahaya pada suatu titik dapat dihitung sebagai:
 
-![](/img/grafkom/image142.png)
+
+$$I = I_{\mathrm{a}} + I_{\mathrm{d}} + I_{\mathrm{s}} = L_{\mathrm{a}}R_{\mathrm{a}} + L_{\mathrm{d}}R_{\mathrm{d}} + L_{\mathrm{s}}R_{\mathrm{s}}$$
 
 Dimana perhitungan dilakukan untuk setiap komponen warna dan setiap sumber cahaya. *Global ambient* $I_{a}$ dapat ditambahkan di akhir jika diinginkan. *Global ambient* ini beda dengan yang per-material/per-light, anggap saja sebagai sumber cahaya tambahan yang berkontribusi untuk komponen *ambient* saja, biasa digunakan untuk mensimulasikan [*Global Illumination*](#-global-illumination). Persamaan lengkapnya dapat dilihat pada bagian akhir [**Specular Reflection**](#3223-specular-reflection) untuk Phong, atau [**Blinn-Phong**](#3224-modified-phong-model-blinn-phong-model).
 
@@ -1262,7 +1274,15 @@ Informasi lebih lanjut dan contoh implementasinya tentang hal ini dapat dilihat 
 
 Karena model Phong hanyalah aproksimasi dalam *object space*, rasanya akan sulit untuk mendapatkan pencahayaan yang diinginkan dengan mencocokkan komponen *ambient* setiap sumber cahaya atau membuat komponen *specular* dan *diffuse* berbeda nilainya. Perhitungan pada vertex shader dan fragment shader pada dasarnya hanya dilakukan dalam konteks objek (titik permukaan tersebut saja) sehingga kita tidak akan bisa mendapatkan informasi mengenai pantulan-pantulan cahaya dari objek-objek lainnya. Sayangnya, perhitungan untuk persamaan rendering secara global masih sulit untuk diselesaikan secara *real-time* (rendering 1 frame harus dilakukan dalam sub-1000/60 = 16.67 ms untuk game dengan frame rate 60 FPS).
 
-![](/img/grafkom/image100.png)
+
+$$I(x,x') = g(x,x')\left[\epsilon(x,x') + \int_S \rho(x,x',x'')\,I(x',x'')\,dx''\right].$$
+
+where:
+
+- $I(x,x')$ — is related to the intensity of light passing from point $x'$ to point $x$
+- $g(x,x')$ — is a “geometry” term
+- $\epsilon(x,x')$ — is related to the intensity of emitted light from $x'$ to $x$
+- $\rho(x,x',x'')$ — is related to the intensity of light scattered from $x''$ to $x$ by a patch of surface at $x'$
 
 *The Famous Rendering Equation (Kajiya, J., 1986)*.\
 Integral bisa diaproksimasikan dengan Monte Carlo, biasa dilakukan oleh *path-tracer renderer*.
@@ -2799,7 +2819,8 @@ Dalam grafika komputer, proyeksi ortografi biasa didefinisikan dalam 6 tupel (le
 
 Pada *homogeneous coordinate*, proyeksi ini dapat didefinisikan dalam matriks yang disebut sebagai *projection matrix* dengan nilai sebagai berikut (jangan lupa [*asumsi matriks*](#2-aturan-matriks-dalam-matematika-vs-webgl))
 
-![](/img/grafkom/image24.png)
+
+$$\begin{bmatrix} \frac{2}{right-left} & 0 & 0 & -\frac{right+left}{right-left} \\ 0 & \frac{2}{top-bottom} & 0 & -\frac{top+bottom}{top-bottom} \\ 0 & 0 & -\frac{2}{far-near} & -\frac{far+near}{far-near} \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
 
 Penurunan matriks ini dapat dilihat pada buku Angel, Interactive Computer Graphics 7th Ed. bagian 5.4.4 Orthogonal Projection Matrices pp. 237 (tl;dr dimulai dari identity projection, yaitu semua tupel bernilai 1 atau -1, merupakan clipping sesuai [*NDC*](#3-sistem-koordinat-clip-space-di-webgl), kemudian transformasi translasi dan scaling sehingga sesuai dengan nilai tupel yang diinginkan).
 
@@ -2815,15 +2836,16 @@ $M_{ortho}\ ST\ H$
 
 Dimana H merupakan transformasi *shearing* dengan matriks berikut:
 
-![](/img/grafkom/image36.png) ![](/img/grafkom/image76.png)
+$$\begin{bmatrix} 1 & 0 & \cot\theta & 0 \\ 0 & 1 & \cot\phi & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ![](/img/grafkom/image76.png)
 
 Kemudian ST adalah transformasi translasi dan scaling dari proyeksi ortografi sebelumnya:
 
-![](/img/grafkom/image27.png)
+
+$$\mathbf{ST} = \begin{bmatrix} \frac{2}{right-left} & 0 & 0 & -\frac{right+left}{right-left} \\ 0 & \frac{2}{top-bottom} & 0 & -\frac{top+bottom}{top-bottom} \\ 0 & 0 & -\frac{2}{far-near} & -\frac{far+near}{near-far} \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
 
 Dan terakhir $M_{ortho}$ merupakan transformasi matriks untuk proyeksi ortografik secara umum pada *plane* z = 0 sebagai berikut:
 
-![](/img/grafkom/image17.png) ![](/img/grafkom/image6.png)
+$$\begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1 \end{pmatrix}$$ $M_{\text{orth}}$
 
 Detail penurunan matriks ini dapat dilihat pada buku Angel, Interactive Computer Graphics 7th Ed. bagian 5.4.5 Oblique Projections pp. 239.
 
@@ -2849,7 +2871,8 @@ Dalam grafika komputer, proyeksi perspektif biasa didefinisikan dalam 4 tuple *f
 
 fovy merupakan *setengah* sudut antara top dan bottom planes dari *view volume* dalam radian (rentang nilai dari 0 hingga *π*/2), sedangkan aspect merupakan aspect ratio dari ukuran *plane*, yaitu $\frac{width}{height}$ dari canvas di WebGL. Proyeksi perspektif dapat dihasilkan dengan matriks proyeksi berikut:
 
-![](/img/grafkom/image52.png)
+
+$$\begin{bmatrix} \frac{near}{right} & 0 & 0 & 0 \\ 0 & \frac{near}{top} & 0 & 0 \\ 0 & 0 & -\frac{far+near}{far-near} & -\frac{2\,far\,near}{far-near} \\ 0 & 0 & -1 & 0 \end{bmatrix}$$
 
 Dimana kita dapat hitung dengan trigonometri
 

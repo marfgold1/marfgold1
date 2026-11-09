@@ -5,6 +5,7 @@ import { markUsed } from '@/lib/chunk-usage.js';
 import { startReading, scrollToHeading } from '@/lib/reading.js';
 import { mdxComponents } from '@/components/mdx/index.js';
 import { ProgressRuler } from '@/components/ProgressRuler.jsx';
+import { Toc } from '@/components/Toc.jsx';
 import { NotFound } from '@/pages/_404.jsx';
 
 const loaders = import.meta.glob<{ default: any }>('/src/blogs/*.mdx');
@@ -47,6 +48,7 @@ function PostView({ post }: { post: PostMeta }) {
 
 	return (
 		<>
+			<Toc />
 			<article class="post" ref={article}>
 				<header class="post-head">
 					<div class="post-meta">
