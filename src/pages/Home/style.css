@@ -1,50 +1,126 @@
 .home {
-	text-align: center;
+	max-width: 44rem;
+	margin: 0 auto;
 	padding-top: 4rem;
+	display: flex;
+	flex-direction: column;
+	gap: 3rem;
 }
 
-.home img {
-	margin-bottom: 1.5rem;
+.hero {
+	text-align: center;
 }
 
-.home img:hover {
-	filter: drop-shadow(0 0 2em color-mix(in srgb, var(--accent) 65%, transparent));
+.hero h1 {
+	font-family: var(--font-display);
+	font-size: 2.75rem;
+	letter-spacing: -0.03em;
+	margin-bottom: 0.25rem;
 }
 
-.home section {
-	margin-top: 5rem;
+.tagline {
+	color: var(--muted);
+	font-size: 1.1rem;
+}
+
+.socials {
+	display: flex;
+	justify-content: center;
+	gap: 1.25rem;
+	margin-top: 1rem;
+}
+
+.socials a {
+	color: var(--link);
+	font-size: 0.95rem;
+}
+
+.home h2 {
+	font-family: var(--font-display);
+	font-size: 1.1rem;
+	letter-spacing: -0.01em;
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	margin-bottom: 0.9rem;
+}
+
+.home h2 a {
+	font-size: 0.85rem;
+	color: var(--link);
+	font-family: var(--font-body);
+}
+
+.now ul,
+.recent-list {
+	list-style: none;
+	padding: 0;
+}
+
+.now li {
+	color: var(--muted);
+	padding: 0.2rem 0;
+}
+
+.now li::before {
+	content: '— ';
+	color: var(--accent);
+}
+
+.featured-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	column-gap: 1.5rem;
+	gap: 1rem;
+	list-style: none;
+	padding: 0;
 }
 
-.resource {
-	padding: 0.75rem 1.5rem;
-	text-align: left;
+.featured-grid a {
+	display: block;
+	height: 100%;
+	padding: 0.9rem 1rem;
 	text-decoration: none;
 	color: var(--fg);
-	background-color: var(--surface);
+	background: var(--surface);
 	border: 1px solid var(--border);
 }
 
-.resource:hover {
+.featured-grid a:hover {
 	border-color: var(--accent);
 	box-shadow: var(--shadow);
 }
 
-.resource h2 {
-	font-size: 1.25rem;
-	letter-spacing: -0.02em;
+.featured-grid h3 {
+	font-size: 1rem;
+	font-family: var(--font-display);
+	margin-bottom: 0.25rem;
 }
 
-.resource p {
+.featured-grid p {
 	color: var(--muted);
+	font-size: 0.88rem;
+}
+
+.recent-list li {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.4rem 0;
+	border-bottom: 1px solid var(--border);
+}
+
+.recent-list time {
+	color: var(--muted);
+	font-size: 0.85rem;
+	white-space: nowrap;
 }
 
 @media (max-width: 639px) {
-	.home section {
-		margin-top: 3rem;
+	.hero h1 {
+		font-size: 2.1rem;
+	}
+
+	.featured-grid {
 		grid-template-columns: 1fr;
-		row-gap: 1rem;
 	}
 }
