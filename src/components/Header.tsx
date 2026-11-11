@@ -66,6 +66,9 @@ export function Header() {
 						<a href="/" class={url == '/' ? 'active' : undefined}>
 							Home
 						</a>
+						<a href="/projects" class={url.startsWith('/projects') ? 'active' : undefined}>
+							Projects
+						</a>
 						<a href="/blog" class={url.startsWith('/blog') ? 'active' : undefined}>
 							Blog
 						</a>

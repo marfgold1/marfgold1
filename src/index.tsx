@@ -1,11 +1,13 @@
-import { LocationProvider, Router, Route, hydrate, prerender as ssr } from 'preact-iso';
+import { LocationProvider, Router, Route, hydrate, prerender as ssr, useLocation } from 'preact-iso';
 
 import { Header } from '@/components/Header.jsx';
 import { Home } from '@/pages/Home/index.jsx';
 import { BlogIndex } from '@/pages/Blog/index.jsx';
 import { BlogPost } from '@/pages/Blog/Post.jsx';
+import { Projects, ProjectDetail } from '@/pages/Projects/index.jsx';
 import { NotFound } from '@/pages/_404.jsx';
 import { getPost } from '@/lib/blog.js';
+import { getProject } from '@/lib/projects.js';
 import { usedChunks } from '@/lib/chunk-usage.js';
 import '@fontsource-variable/bricolage-grotesque/index.css';
 import '@fontsource-variable/figtree/index.css';
@@ -18,15 +20,24 @@ export function App(_props: { url?: string }) {
 	return (
 		<LocationProvider>
 			<Header />
-			<main>
-				<Router>
-					<Route path="/" component={Home} />
-					<Route path="/blog" component={BlogIndex} />
-					<Route path="/blog/:slug" component={BlogPost} />
-					<Route default component={NotFound} />
-				</Router>
-			</main>
+			<MainArea />
 		</LocationProvider>
+	);
+}
+
+function MainArea() {
+	const { url } = useLocation();
+	return (
+		<main>
+			<Router>
+				<Route path="/" component={Home} />
+				<Route path="/blog" component={BlogIndex} />
+				<Route path="/projects" component={Projects} />
+				<Route path="/projects/:slug" component={ProjectDetail} />
+				<Route path="/blog/:slug" component={BlogPost} />
+				<Route default component={NotFound} />
+			</Router>
+		</main>
 	);
 }
 
@@ -84,6 +95,27 @@ function headFor(url: string) {
 			},
 		});
 		return { lang: 'en', title: `${post.title} | ${SITE}`, elements: new Set(els) };
+	}
+
+	if (path.startsWith('/projects/')) {
+		const slug = path.slice('/projects/'.length);
+		const project = getProject(slug);
+		if (project) {
+			return {
+				lang: 'en',
+				title: `${project.name} | ${SITE}`,
+				elements: new Set<HeadEl>([meta({ name: 'description', content: project.description }), canonical]),
+			};
+		}
+	}
+
+	if (path === '/projects') {
+		const description = 'Things I have built.';
+		return {
+			lang: 'en',
+			title: `Projects | ${SITE}`,
+			elements: new Set<HeadEl>([meta({ name: 'description', content: description }), canonical]),
+		};
 	}
 
 	return { lang: 'en', title: SITE, elements: new Set<HeadEl>() };
