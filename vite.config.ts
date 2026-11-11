@@ -13,6 +13,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { createCssVariablesTheme } from 'shiki';
 import { blogIndex, scanPosts } from './plugins/blog-index.ts';
 import { projectIndex } from './plugins/project-index.ts';
+import { v86Manifest } from './plugins/v86-manifest.ts';
 import { mdxCss } from './plugins/mdx-css.ts';
 import { remarkKatexCss, katexWoff2Only } from './plugins/katex-css.ts';
 
@@ -39,6 +40,7 @@ export default defineConfig(() => {
 		plugins: [
 			blogIndex(blogsDir),
 			projectIndex(projectsDir),
+			v86Manifest(),
 			katexWoff2Only(),
 			{
 				enforce: 'pre',
@@ -58,8 +60,10 @@ export default defineConfig(() => {
 					enabled: true,
 					renderTarget: '#app',
 					additionalPrerenderRoutes: ['/404', '/blog', '/projects', ...slugs.map((s) => `/blog/${s}`)],
-					previewMiddlewareEnabled: true,
-					previewMiddlewareFallback: '/404',
+					// disabled: the middleware hijacks any extensionless GET (e.g.
+					// /v86/jarkom/vmlinuz) and serves index.html instead of the
+					// static file; the client router handles direct URLs in preview
+					previewMiddlewareEnabled: false,
 				},
 			}),
 			mdxCss(),
