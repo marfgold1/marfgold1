@@ -18,6 +18,30 @@
 	font-size: 0.9rem;
 }
 
+/* boot-image download progress */
+.demo-progress {
+	display: block;
+	width: 16rem;
+	height: 4px;
+	margin-top: 0.4rem;
+	background: var(--border);
+	border-radius: 999px;
+	overflow: hidden;
+}
+
+.demo-progress-fill {
+	display: block;
+	height: 100%;
+	background: var(--accent);
+	transition: width 0.15s;
+}
+
+.demo-progress-text {
+	display: block;
+	font-size: 0.8rem;
+	margin-top: 0.25rem;
+}
+
 .demo-status.error {
 	color: var(--amber);
 }

@@ -1,56 +1,28 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { V86, V86Options } from 'v86';
+import { V86 } from 'v86';
 import wasmUrl from 'v86/build/v86.wasm?url';
+import { DemoControls, fetchV86Assets, useDemoBoot, v86Options, type V86Asset } from './v86-utils.js';
 import './demo.css';
 
-const VMLINUZ = '/v86/jarkom/vmlinuz';
-const INITRD = '/v86/jarkom/initramfs.cpio.gz';
-
-const mkOpts = (container: HTMLElement, cmdline: string): V86Options => ({
-	wasm_path: wasmUrl,
-	bios: { url: '/v86/bios/seabios.bin' },
-	vga_bios: { url: '/v86/bios/vgabios.bin' },
-	bzimage: { url: VMLINUZ },
-	initrd: { url: INITRD },
-	cmdline,
-	// default 64MB is too tight for kernel + initrd + unpacked rootfs
-	memory_size: 128 * 1024 * 1024,
-	net_device: { type: 'virtio' },
-	screen: {container},
-	autostart: true,
-	disable_speaker: true,
-});
+// the wasm fetch joins the same concurrent batch + progress bar
+const ASSETS: V86Asset[] = [
+	{ name: 'wasm', url: wasmUrl },
+	{ name: 'bios', url: '/v86/bios/seabios.bin' },
+	{ name: 'vga', url: '/v86/bios/vgabios.bin' },
+	{ name: 'kernel', url: '/v86/jarkom/vmlinuz' },
+	{ name: 'initrd', url: '/v86/jarkom/initramfs.cpio.gz' },
+];
 
 export function JarkomDemo() {
 	const screenA = useRef<HTMLDivElement>(null);
 	const screenB = useRef<HTMLDivElement>(null);
 	const emA = useRef<V86 | null>(null);
 	const emB = useRef<V86 | null>(null);
-	const gridA = useRef<string[]>([]);
-	const gridB = useRef<string[]>([]);
-
-	// copy the focused VM's visible VGA text buffer to the host clipboard
-	const copyScreen = () => {
-		const grid = focus === 'a' ? gridA.current : gridB.current;
-		if (!grid.length) return;
-		const rows: string[] = [];
-		for (let r = 0; r < 25; r++) {
-			const line = grid.slice(r * 80, r * 80 + 80).join('').trimEnd();
-			if (line || rows.length) rows.push(line);
-		}
-		while (rows.length && !rows[rows.length - 1]) rows.pop();
-		navigator.clipboard.writeText(rows.join('\n')).catch(() => {});
-	};
-	const [state, setState] = useState<'idle' | 'loading' | 'running' | 'error'>('idle');
-	const [error, setError] = useState('');
 	const [focus, setFocus] = useState<'a' | 'b'>('a');
 	const focusRef = useRef<'a' | 'b'>('a');
 	focusRef.current = focus;
 	const [packets, setPackets] = useState<{ dir: string; line: string; dump: string[] }[]>([]);
 	const [openPacket, setOpenPacket] = useState<number | null>(null);
-	const [lossy, setLossy] = useState(false);
-	const lossyRef = useRef(false);
-	lossyRef.current = lossy;
 	const [guestCtrl, setGuestCtrl] = useState(true);
 	const guestCtrlRef = useRef(true);
 	guestCtrlRef.current = guestCtrl;
@@ -131,26 +103,23 @@ export function JarkomDemo() {
 		return () => document.removeEventListener('keydown', onKey, true);
 	}, []);
 
-	const boot = async () => {
-		if (state !== 'idle' && state !== 'error') return;
-		setState('loading');
-		try {
+	const { state, error, progress, boot } = useDemoBoot({
+		boot: async (onProgress) => {
 			if (!screenA.current || !screenB.current) return;
+			// fetch once (progress bar), then boot both VMs from the same
+			// buffers and compiled wasm module
+			const assets = await fetchV86Assets(ASSETS, onProgress);
+			const mkOpts = (container: HTMLElement, cmdline: string) =>
+				v86Options(container, assets, {
+					cmdline,
+					// default 64MB is too tight for kernel + initrd + unpacked rootfs
+					memory_size: 128 * 1024 * 1024,
+					net_device: { type: 'virtio' },
+				});
 			const a = new V86(mkOpts(screenA.current, 'console=tty0 vmip=10.5.0.2 role=server'));
 			const b = new V86(mkOpts(screenB.current, 'console=tty0 vmip=10.5.0.3 role=client'));
 			b.keyboard_set_enabled(false);
-			// track the VGA text buffer per VM so the screen can be copied to host
-			const trackScreen = (em: V86, grid: string[]) => {
-				em.add_listener('screen-put-char', ([row, col, chr]) => {
-					if (row >= 0 && row < 25 && col >= 0 && col < 80) grid[row * 80 + col] = String.fromCharCode(chr);
-				});
-			};
-			gridA.current = Array(25 * 80).fill(' ');
-			gridB.current = Array(25 * 80).fill(' ');
-			trackScreen(a, gridA.current);
-			trackScreen(b, gridB.current);
-			// direct wire: whatever one NIC emits, the other receives.
-			// "lossy" toggle: 200–500ms latency + 10% random drops, to test durability.
+			// direct wire: whatever one NIC emits, the other receives
 			const wire = (dir: string, from: V86, to: V86) => {
 				from.add_listener('net0-send', (d) => {
 					try {
@@ -159,24 +128,15 @@ export function JarkomDemo() {
 					} catch {
 						// non-frame or truncated payload: skip the log line
 					}
-					if (lossyRef.current) {
-						if (Math.random() < 0.1) return; // dropped
-						setTimeout(() => to.bus.send('net0-receive', d), 200 + Math.random() * 300);
-					} else {
-						to.bus.send('net0-receive', d);
-					}
+					to.bus.send('net0-receive', d);
 				});
 			};
 			wire('A→B', a, b);
 			wire('B→A', b, a);
 			emA.current = a;
 			emB.current = b;
-			setState('running');
-		} catch (e) {
-			setError(String((e as Error).message));
-			setState('error');
-		}
-	};
+		},
+	});
 
 	const focusOn = (which: 'a' | 'b') => {
 		setFocus(which);
@@ -197,48 +157,19 @@ export function JarkomDemo() {
 
 	return (
 		<div class="demo-embed demo-twin">
-			<div class="demo-controls">
-				{state === 'idle' && (
-					<button class="try-it" onClick={boot}>
-						Boot both
-					</button>
-				)}
-				{state === 'loading' && <span class="demo-status">Loading two Linux VMs…</span>}
-				{state === 'error' && (
-					<>
-						<span class="demo-status error">{error}</span>
-						<button class="try-it" onClick={boot}>
-							Retry
-						</button>
-					</>
-				)}
-				{state === 'running' && (
-					<>
-						<button class="try-it" onClick={copyScreen}>
-							Copy screen {focus === 'a' ? '1' : '2'}
-						</button>
-						<button class="try-it" onClick={paste}>
-							Paste to VM {focus === 'a' ? '1' : '2'}
-						</button>
-						<label class="lossy-toggle">
-						<input
-							type="checkbox"
-							checked={guestCtrl}
-							onChange={(e) => setGuestCtrl((e.target as HTMLInputElement).checked)}
-						/>
-						Capture Keyboard (disable to let browser copy work)
-					</label>
-					<label class="lossy-toggle">
-							<input
-								type="checkbox"
-								checked={lossy}
-								onChange={(e) => setLossy((e.target as HTMLInputElement).checked)}
-							/>
-							lossy link (200–500ms + 10% loss)
-						</label>
-					</>
-				)}
-			</div>
+			<DemoControls state={state} error={error} progress={progress} label="Loading two Linux VMs…" bootLabel="Boot both" onBoot={boot}>
+				<button class="try-it" onClick={paste}>
+					Paste to VM {focus === 'a' ? '1' : '2'}
+				</button>
+				<label class="lossy-toggle">
+					<input
+						type="checkbox"
+						checked={guestCtrl}
+						onChange={(e) => setGuestCtrl((e.target as HTMLInputElement).checked)}
+					/>
+					Capture Keyboard (disable to let browser copy work)
+				</label>
+			</DemoControls>
 			<div class="twin-grid">
 				<Pane label="VM 1 — server 10.5.0.2" focused={focus === 'a'} onFocus={() => focusOn('a')} screenRef={screenA} />
 				<Pane label="VM 2 — client 10.5.0.3" focused={focus === 'b'} onFocus={() => focusOn('b')} screenRef={screenB} />
