@@ -24,7 +24,8 @@
 		"remark-gfm": "^4.0.1",
 		"remark-math": "^6.0.0",
 		"remark-mdx-frontmatter": "^6.0.0",
-		"shiki": "^4.6.0"
+		"shiki": "^4.6.0",
+		"v86": "^0.5.473"
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.10.6",

@@ -131,6 +131,66 @@ main {
 	border-color: var(--muted);
 }
 
+/* ---- shared building blocks ---- */
+
+/* embedded project demo: <DemoFrame> renders iframe or async component */
+.detail-demo {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.demo-frame {
+	border: 1px solid var(--border);
+	background: #000;
+	/* fixed height: boot controls appearing inside must not shift the layout */
+	height: min(34rem, 70vh);
+	overflow: auto;
+}
+
+.demo-frame:fullscreen {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
+/* component demos bring their own panes; no black box or border */
+.demo-frame-bare {
+	background: transparent;
+	border: none;
+	height: auto;
+	overflow: visible;
+}
+
+.demo-frame iframe {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: none;
+}
+
+.demo-frame-loading {
+	display: grid;
+	place-items: center;
+	height: 100%;
+	color: var(--muted);
+	font-family: var(--font-mono);
+	font-size: 0.85rem;
+}
+
+.try-it {
+	font: inherit;
+	font-size: 0.9rem;
+	cursor: pointer;
+	color: var(--accent);
+	background: var(--accent-soft);
+	border: none;
+	padding: 0.25rem 0.8rem;
+	border-radius: 999px;
+	align-self: flex-start;
+}
+
 @media (max-width: 639px) {
 	main {
 		padding: 0 16px 48px;

@@ -1,0 +1,113 @@
+.demo-page {
+	max-width: 48rem;
+}
+
+.demo-blurb {
+	color: var(--muted);
+}
+
+.demo-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin: 1rem 0;
+}
+
+.demo-status {
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.demo-status.error {
+	color: var(--amber);
+}
+
+.v86-screen {
+	background: #000;
+	border: 1px solid var(--border);
+	padding: 0.5rem;
+	min-height: 12rem;
+}
+
+.v86-screen > div:first-child {
+	color: #ccc;
+	outline: none;
+}
+
+/* twin VM panes (jarkom demo) */
+
+.twin-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+
+.twin-pane {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+	min-width: 0;
+}
+
+.twin-label {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--muted);
+}
+
+.twin-pane[data-focused] .v86-screen {
+	border-color: var(--accent);
+}
+
+.lossy-toggle {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.85rem;
+	color: var(--muted);
+	cursor: pointer;
+}
+
+/* packet inspector */
+
+.packet-log {
+	font: 11px/1.5 var(--font-mono);
+	color: var(--muted);
+	background: var(--surface);
+	border: 1px solid var(--border);
+	padding: 0.5rem 0.75rem;
+	max-height: 12rem;
+	overflow-y: auto;
+	word-break: break-all;
+}
+
+.packet-line {
+	cursor: pointer;
+	user-select: none;
+}
+
+.packet-line:hover {
+	color: var(--fg);
+}
+
+.packet-dir {
+	color: var(--accent);
+}
+
+.packet-dump {
+	font: inherit;
+	color: var(--fg);
+	margin: 0.25rem 0 0.5rem 1rem;
+	padding: 0.5rem;
+	background: var(--code-bg);
+	border: 1px solid var(--border);
+	white-space: pre;
+	overflow-x: auto;
+}
+
+@media (max-width: 767px) {
+	.twin-grid {
+		grid-template-columns: 1fr;
+	}
+}
